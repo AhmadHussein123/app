@@ -3,2070 +3,1466 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prevention Reports - تقارير الوقاية</title>
+    <title>تطبيق تقارير الوقاية</title>
     
-    <!-- ===== أيقونات زراعية ===== -->
-    <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
-    
-    <!-- Font Awesome و html2pdf -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        /* ===== متغيرات الثيم ===== */
-        :root {
-            --bg-primary: #f0f8f0;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f9fdf9;
-            --text-primary: #333333;
-            --text-secondary: #4a7c4a;
-            --border-color: #dddddd;
-            --header-gradient-start: #1e4d1e;
-            --header-gradient-end: #2d5e2d;
-            --accent-color: #2d5e2d;
-            --accent-light: #e9f5e9;
-            --accent-dark: #1e4d1e;
-            --warning-color: #f0ad4e;
-            --danger-color: #d9534f;
-            --info-color: #3a7bd5;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --input-bg: #ffffff;
-            --input-border: #cccccc;
-            --table-stripe: #f9f9f9;
-            --success-color: #28a745;
-        }
-        
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --bg-tertiary: #333333;
-            --text-primary: #e0e0e0;
-            --text-secondary: #9bc49b;
-            --border-color: #404040;
-            --header-gradient-start: #0f2b0f;
-            --header-gradient-end: #1a3d1a;
-            --accent-color: #4caf50;
-            --accent-light: #2d5e2d;
-            --accent-dark: #0f2b0f;
-            --warning-color: #ffb74d;
-            --danger-color: #f0625d;
-            --info-color: #64b5f6;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --input-bg: #3d3d3d;
-            --input-border: #555555;
-            --table-stripe: #363636;
-        }
-        
-        body { 
-            background-color: var(--bg-primary); 
-            color: var(--text-primary); 
-            line-height: 1.6; 
-            padding: 70px 20px 60px 20px;
+
+        body {
+            background-color: #f0f8f0;
+            color: #333;
+            padding: 80px 20px 70px 20px;
             min-height: 100vh;
-            position: relative;
         }
-        
-        /* ===== أزرار التحكم المحسنة ===== */
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .theme-switch {
-            display: inline-block;
-            height: 34px;
-            position: relative;
-            width: 60px;
-        }
-        
-        .theme-switch input {
-            display: none;
-        }
-        
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
-            cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            background-color: #fff;
-            bottom: 4px;
-            content: "";
-            height: 26px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 26px;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--accent-color);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        .slider i {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            z-index: 1;
-        }
-        
-        .slider .fa-sun {
-            left: 8px;
-            color: #f39c12;
-        }
-        
-        .slider .fa-moon {
-            right: 8px;
-            color: #f1c40f;
-        }
-        
-        .lang-switch {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 2px solid var(--accent-color);
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .lang-switch:hover {
-            background-color: var(--accent-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px var(--shadow-color);
-        }
-        
-        .fixed-header {
+
+        /* الشريط العلوي */
+        .top-bar {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+            background: linear-gradient(135deg, #1e4d1e, #2d5e2d);
             color: white;
-            padding: 10px 20px;
-            box-shadow: 0 2px 10px var(--shadow-color);
-            z-index: 9999;
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--warning-color);
+            z-index: 1000;
+            border-bottom: 3px solid #f0ad4e;
         }
-        
-        .fixed-header .logo {
+
+        .logo {
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 20px;
+            font-weight: bold;
         }
-        
-        .fixed-header .logo i {
+
+        .logo i {
+            color: #f0ad4e;
             font-size: 24px;
-            color: var(--warning-color);
         }
-        
-        .fixed-header .controls {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .fixed-header .date-time {
-            font-size: 14px;
-            background-color: rgba(255,255,255,0.2);
+
+        .date-time {
+            background: rgba(255,255,255,0.2);
             padding: 5px 15px;
             border-radius: 20px;
+            font-size: 14px;
         }
-        
-        .fixed-footer {
+
+        /* الشريط السفلي */
+        .bottom-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(135deg, var(--header-gradient-end) 0%, var(--header-gradient-start) 100%);
+            background: linear-gradient(135deg, #2d5e2d, #1e4d1e);
             color: white;
-            padding: 8px 20px;
-            box-shadow: 0 -2px 10px var(--shadow-color);
-            z-index: 9999;
+            padding: 10px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 2px solid var(--warning-color);
+            z-index: 1000;
+            border-top: 3px solid #f0ad4e;
         }
-        
-        .fixed-footer .copyright {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .fixed-footer .version {
-            background-color: var(--warning-color);
-            color: var(--header-gradient-start);
-            padding: 3px 10px;
+
+        .version {
+            background: #f0ad4e;
+            color: #1e4d1e;
+            padding: 3px 12px;
             border-radius: 15px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 13px;
         }
-        
-        .container { max-width: 1400px; margin: 0 auto; }
-        
-        header { 
-            text-align: center; 
-            padding: 20px 0; 
-            margin-bottom: 30px; 
-            border-bottom: 3px solid var(--accent-color); 
-        }
-        
-        h1 { 
-            color: var(--accent-color); 
-            font-size: 32px; 
-            margin-bottom: 10px; 
-        }
-        
-        .subtitle { 
-            color: var(--text-secondary); 
-            font-size: 18px; 
-        }
-        
-        .main-controls { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            flex-wrap: wrap; 
-            gap: 20px; 
-        }
-        
-        .tabs-container { 
-            display: flex; 
-            gap: 15px; 
-            flex-wrap: wrap; 
-        }
-        
-        .tab-btn { 
-            padding: 12px 24px; 
-            background-color: var(--bg-secondary); 
-            border: 2px solid var(--accent-color); 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 600; 
-            color: var(--accent-color); 
-            transition: all 0.3s ease; 
-        }
-        
-        .tab-btn:hover { 
-            background-color: var(--accent-light); 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px var(--shadow-color);
-        }
-        
-        .tab-btn.active { 
-            background-color: var(--accent-color); 
-            color: white; 
-        }
-        
-        .action-buttons { 
-            display: flex; 
-            gap: 15px; 
-            flex-wrap: wrap; 
-        }
-        
-        .files-btn { 
-            background-color: var(--info-color); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 600; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            transition: all 0.3s ease; 
-        }
-        
-        .files-btn:hover { 
-            background-color: #2a5bb5; 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px var(--shadow-color);
-        }
-        
-        .clear-btn { 
-            background-color: var(--warning-color); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 600; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            transition: all 0.3s ease; 
-        }
-        
-        .clear-btn:hover { 
-            background-color: #ec971f; 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px var(--shadow-color);
-        }
-        
-        .form-container { 
-            display: none; 
-            background-color: var(--bg-secondary); 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 5px 20px var(--shadow-color); 
-            margin-bottom: 30px; 
-        }
-        
-        .form-container.active { 
-            display: block; 
-            animation: fadeIn 0.5s ease; 
-        }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        /* ===== أنماط المعاينة المحسنة ===== */
-        .preview-window {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-secondary);
-            z-index: 15000;
-            overflow: auto;
-            padding: 20px;
-            padding-top: 80px;
-            padding-bottom: 80px;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        [dir="ltr"] .preview-window {
-            direction: ltr;
-        }
-        
-        [dir="rtl"] .preview-window {
-            direction: rtl;
-        }
-        
-        .preview-content {
-            max-width: 210mm;
+
+        /* الحاوية الرئيسية */
+        .container {
+            max-width: 1300px;
             margin: 0 auto;
-            padding: 25mm;
-            background: var(--bg-secondary);
-            box-shadow: 0 0 30px var(--shadow-color);
-            border-radius: 8px;
-            position: relative;
         }
-        
-        .preview-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--accent-color), var(--warning-color), var(--info-color));
-            border-radius: 8px 8px 0 0;
-        }
-        
-        .preview-header {
+
+        /* الهيدر */
+        .header {
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 3px solid var(--accent-color);
-            position: relative;
+            border-bottom: 3px solid #2d5e2d;
         }
-        
-        .preview-header::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: var(--warning-color);
-        }
-        
-        .preview-header h1 {
-            color: var(--accent-color);
-            margin-bottom: 10px;
+
+        .header h1 {
+            color: #2d5e2d;
             font-size: 32px;
-            text-shadow: 2px 2px 4px var(--shadow-color);
+            margin-bottom: 10px;
         }
-        
-        .preview-header p {
-            color: var(--text-secondary);
+
+        .header p {
+            color: #4a7c4a;
             font-size: 18px;
         }
-        
-        .preview-section {
-            margin-bottom: 25px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-tertiary);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .preview-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 30px 30px 0;
-            border-color: transparent var(--accent-color) transparent transparent;
-            opacity: 0.3;
-        }
-        
-        [dir="ltr"] .preview-section::before {
-            right: auto;
-            left: 0;
-            border-width: 0 0 30px 30px;
-            border-color: transparent transparent transparent var(--accent-color);
-        }
-        
-        .preview-section-title {
-            color: var(--accent-color);
-            font-size: 20px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--warning-color);
-            display: inline-block;
-        }
-        
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px var(--shadow-color);
-        }
-        
-        .preview-table th {
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
-            color: white;
-            padding: 12px;
-            font-weight: bold;
-        }
-        
-        [dir="rtl"] .preview-table th {
-            text-align: right;
-        }
-        
-        [dir="ltr"] .preview-table th {
-            text-align: left;
-        }
-        
-        .preview-table td {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .preview-table tr {
-            transition: background-color 0.3s ease;
-        }
-        
-        .preview-table tr:nth-child(even) {
-            background-color: var(--table-stripe);
-        }
-        
-        .preview-table tr:hover {
-            background-color: var(--accent-light);
-        }
-        
-        .preview-signatures {
+
+        /* أزرار التحكم */
+        .controls {
             display: flex;
             justify-content: space-between;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 2px dashed var(--border-color);
-        }
-        
-        .preview-signature {
-            text-align: center;
-            width: 45%;
-        }
-        
-        .preview-signature h4 {
-            margin-bottom: 15px;
-            color: var(--accent-color);
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .preview-signature .signature-line {
-            margin-top: 40px;
-            padding-top: 10px;
-            border-top: 2px solid var(--border-color);
-            min-height: 50px;
-            font-weight: bold;
-        }
-        
-        /* ===== أزرار التحكم في المعاينة المحسنة ===== */
-        .preview-controls {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-secondary);
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            z-index: 16000;
-            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
             gap: 15px;
-            border: 2px solid var(--accent-color);
-            animation: slideDown 0.5s ease;
         }
-        
-        @keyframes slideDown {
-            from { transform: translate(-50%, -100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
         }
-        
-        .preview-btn {
+
+        .tab-btn {
             padding: 12px 25px;
-            border: none;
-            border-radius: 50px;
+            border: 2px solid #2d5e2d;
+            background: white;
+            color: #2d5e2d;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #e9f5e9;
+        }
+
+        .tab-btn.active {
+            background: #2d5e2d;
+            color: white;
+        }
+
+        .action-btns {
             display: flex;
-            align-items: center;
             gap: 10px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
-        
-        .preview-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .preview-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .preview-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px var(--shadow-color);
-        }
-        
-        .download-btn-preview {
-            background: linear-gradient(135deg, var(--success-color), #34a853);
-            color: white;
-        }
-        
-        .print-btn {
-            background: linear-gradient(135deg, var(--info-color), #3a7bd5);
-            color: white;
-        }
-        
-        .close-preview-btn {
-            background: linear-gradient(135deg, var(--danger-color), #d32f2f);
-            color: white;
-        }
-        
-        /* ===== نافذة التحميل المحسنة ===== */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 25000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: white;
-            backdrop-filter: blur(5px);
-        }
-        
-        .loading-content {
-            text-align: center;
-            background: var(--bg-secondary);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px var(--shadow-color);
-        }
-        
-        .loading-spinner {
-            border: 5px solid var(--bg-tertiary);
-            border-top: 5px solid var(--accent-color);
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        .loading-spinner-2 {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--bg-tertiary);
-            border-top-color: var(--warning-color);
-            border-right-color: var(--info-color);
-            border-radius: 50%;
-            animation: spin 1.5s ease-in-out infinite;
-            margin: 10px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-progress {
-            width: 300px;
-            height: 10px;
-            background: var(--bg-tertiary);
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-        
-        .loading-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-color), var(--warning-color));
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        /* ===== أنماط الطباعة المحسنة ===== */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            
-            .fixed-header, .fixed-footer, .help-btn, .preview-controls, .loading-overlay {
-                display: none !important;
-            }
-            
-            .preview-window, .preview-window * {
-                visibility: visible;
-            }
-            
-            .preview-window {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: auto;
-                padding: 0;
-                margin: 0;
-                background: white;
-            }
-            
-            .preview-content {
-                box-shadow: none;
-                padding: 15mm;
-                max-width: 100%;
-            }
-            
-            .preview-section {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                border: 1px solid #ddd;
-            }
-            
-            .preview-table {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-            
-            .preview-header h1 {
-                color: #2d5e2d;
-            }
-        }
-        
-        /* ===== باقي الأنماط ===== */
-        .save-btn {
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
-            color: white;
+
+        .action-btn {
+            padding: 12px 25px;
             border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px var(--shadow-color);
+            transition: all 0.3s;
+            color: white;
         }
-        
-        .save-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px var(--shadow-color);
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
-        .info-message {
-            text-align: center;
-            margin: 15px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--accent-light) 100%);
-            border-radius: 50px;
-            border: 2px solid var(--accent-color);
-            color: var(--accent-color);
+
+        .clear-btn {
+            background: #f0ad4e;
+        }
+
+        .files-btn {
+            background: #3a7bd5;
+        }
+
+        .save-btn {
+            background: #2d5e2d;
+        }
+
+        /* النماذج */
+        .form-container {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .form-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-title h2 {
+            color: #2d5e2d;
+            font-size: 24px;
+        }
+
+        .form-title input {
+            width: 150px;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-title input:focus {
+            border-color: #2d5e2d;
+            outline: none;
+        }
+
+        /* معلومات التقرير */
+        .report-info {
+            background: #f0f8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item label {
+            font-weight: bold;
+            color: #2d5e2d;
+            font-size: 16px;
+        }
+
+        .info-item input {
+            width: 200px;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        /* أقسام النموذج */
+        .form-section {
+            background: #f9fdf9;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-right: 4px solid #2d5e2d;
+        }
+
+        .section-title {
+            color: #2d5e2d;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        /* شبكة الطقس */
+        .weather-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .weather-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: 600;
-            box-shadow: 0 4px 10px var(--shadow-color);
+            color: #555;
         }
-        
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #2d5e2d;
+            outline: none;
+        }
+
+        .temp-range {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .temp-range input {
+            width: 120px;
+        }
+
+        /* شذوذ الطقس */
+        .anomaly-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .anomaly-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .anomaly-item input[type="text"] {
+            flex: 1;
+        }
+
+        /* جداول الآفات */
+        .pests-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .pests-table th {
+            background: #2d5e2d;
+            color: white;
+            padding: 12px;
+            text-align: right;
+        }
+
+        .pests-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .pests-table input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 8px;
+        }
+
+        .pests-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* جدول المصائد */
+        .traps-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .traps-table th {
+            background: #3a7bd5;
+            color: white;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .traps-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .traps-table input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* التوقيعات */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .signature {
+            text-align: center;
+            width: 45%;
+        }
+
+        .signature label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #2d5e2d;
+        }
+
+        .signature input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        /* نافذة المعاينة */
+        .preview-window {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            overflow: auto;
+            padding: 80px 20px 70px 20px;
+        }
+
+        .preview-content {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2d5e2d;
+        }
+
+        .preview-header h1 {
+            color: #2d5e2d;
+            margin-bottom: 10px;
+        }
+
+        .preview-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9fdf9;
+            border-right: 4px solid #2d5e2d;
+            border-radius: 8px;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .preview-table th {
+            background: #2d5e2d;
+            color: white;
+            padding: 10px;
+            text-align: right;
+        }
+
+        .preview-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .preview-controls {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 10px;
+            z-index: 2100;
+        }
+
+        .preview-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: white;
+        }
+
+        .pdf-btn { background: #2d5e2d; }
+        .print-btn { background: #3a7bd5; }
+        .close-preview-btn { background: #d9534f; }
+
+        /* الإشعارات */
+        .notification {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #2d5e2d;
+            color: white;
+            border-radius: 8px;
+            display: none;
+            z-index: 3000;
+        }
+
+        /* نافذة التحميل */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 4000;
+        }
+
+        .loading-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2d5e2d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* زر المساعدة */
         .help-btn {
             position: fixed;
             bottom: 80px;
             left: 20px;
-            background: linear-gradient(135deg, var(--info-color), #2a5bb5);
+            width: 50px;
+            height: 50px;
+            background: #3a7bd5;
             color: white;
             border: none;
-            padding: 15px;
             border-radius: 50%;
             cursor: pointer;
-            z-index: 10001;
-            width: 60px;
-            height: 60px;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1100;
+        }
+
+        /* لوحة التقارير */
+        .files-panel {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .files-panel.active {
+            display: block;
+        }
+
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .files-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .file-item:hover {
+            background: #f9f9f9;
+        }
+
+        .file-info {
             display: flex;
             align-items: center;
+            gap: 15px;
+        }
+
+        .file-icon {
+            font-size: 24px;
+            color: #2d5e2d;
+        }
+
+        /* نافذة التعليمات */
+        .instructions-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
             justify-content: center;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            transition: all 0.3s ease;
+            align-items: center;
+            z-index: 5000;
         }
-        
-        .help-btn:hover {
-            transform: scale(1.1) rotate(360deg);
-            box-shadow: 0 8px 25px var(--shadow-color);
+
+        .instructions-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
         }
-        
-        @media (max-width: 768px) {
-            .preview-controls {
-                flex-direction: column;
-                border-radius: 20px;
-                padding: 15px;
-                top: 70px;
+
+        /* طباعة */
+        @media print {
+            .top-bar, .bottom-bar, .preview-controls, .help-btn {
+                display: none !important;
             }
-            
-            .preview-btn {
-                width: 100%;
-                justify-content: center;
+            .preview-window {
+                padding: 0;
             }
         }
     </style>
 </head>
-<body dir="rtl" data-theme="light">
-
-    <!-- ===== الشريط الثابت في الأعلى ===== -->
-    <div class="fixed-header">
+<body>
+    <!-- الشريط العلوي -->
+    <div class="top-bar">
         <div class="logo">
             <i class="fas fa-leaf"></i>
-            <span class="app-name-ar">تطبيق تقارير الوقاية</span>
-            <span class="app-name-en" style="display: none;">Prevention Reports App</span>
+            <span>تطبيق تقارير الوقاية</span>
         </div>
-        
-        <div class="controls">
-            <div class="theme-switch-wrapper">
-                <div class="theme-switch">
-                    <input type="checkbox" id="theme-toggle">
-                    <label for="theme-toggle" class="slider">
-                        <i class="fas fa-sun"></i>
-                        <i class="fas fa-moon"></i>
-                    </label>
-                </div>
-            </div>
-            
-            <button class="lang-switch" id="lang-toggle">
-                <i class="fas fa-language"></i>
-                <span class="lang-text">English</span>
-            </button>
-            
-            <div class="date-time" id="currentDateTime"></div>
-        </div>
+        <div class="date-time" id="currentDateTime"></div>
     </div>
 
-    <div class="fixed-footer">
+    <!-- الشريط السفلي -->
+    <div class="bottom-bar">
         <div class="copyright">
             <i class="far fa-copyright"></i>
-            <span class="copyright-ar">جميع الحقوق محفوظة - By: Ahmad Hussein</span>
-            <span class="copyright-en" style="display: none;">All Rights Reserved - By: Ahmad Hussein</span>
+            <span>جميع الحقوق محفوظة - By: Ahmad Hussein</span>
         </div>
-        <div class="version">
-            <span>v2.0</span>
-        </div>
+        <div class="version">الإصدار 2.0</div>
     </div>
-
+    
     <div class="container">
-        <header>
-            <h1 class="title-ar">تطبيق تقارير الوقاية</h1>
-            <h1 class="title-en" style="display: none;">Prevention Reports App</h1>
-            <p class="subtitle subtitle-ar">الوقاية</p>
-            <p class="subtitle subtitle-en" style="display: none;">Prevention</p>
-        </header>
-        
-        <div class="info-message">
-            <i class="fas fa-info-circle"></i>
-            <span class="info-ar">
-                <strong>لتثبيت التطبيق على جهازك:</strong><br>
-                • أيفون: اضغط على زر المشاركة <i class="fas fa-share"></i> ثم "إضافة إلى الشاشة الرئيسية"<br>
-                • أندرويد: اضغط على القائمة <i class="fas fa-ellipsis-vertical"></i> ثم "إضافة إلى الشاشة الرئيسية"
-            </span>
-            <span class="info-en" style="display: none;">
-                <strong>To install the app:</strong><br>
-                • iPhone: Tap share <i class="fas fa-share"></i> then "Add to Home Screen"<br>
-                • Android: Tap menu <i class="fas fa-ellipsis-vertical"></i> then "Add to Home Screen"
-            </span>
+        <!-- الهيدر -->
+        <div class="header">
+            <h1>تطبيق تقارير الوقاية</h1>
+            <p>الوقاية</p>
         </div>
-        
-        <div class="main-controls">
-            <div class="tabs-container">
-                <button class="tab-btn active" data-tab="form1">
-                    <span class="tab-ar">تقرير النصف شهري</span>
-                    <span class="tab-en" style="display: none;">Bi-Weekly Report</span>
-                </button>
-                <button class="tab-btn" data-tab="form2">
-                    <span class="tab-ar">تقرير قراءة المصائد</span>
-                    <span class="tab-en" style="display: none;">Traps Report</span>
-                </button>
+
+        <!-- أزرار التحكم -->
+        <div class="controls">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="form1">تقرير النصف شهري</button>
+                <button class="tab-btn" data-tab="form2">تقرير قراءة المصائد</button>
             </div>
-            
-            <div class="action-buttons">
-                <button class="clear-btn" id="clearBtn">
-                    <i class="fas fa-eraser"></i>
-                    <span class="clear-ar">مسح النموذج</span>
-                    <span class="clear-en" style="display: none;">Clear Form</span>
-                </button>
-                <button class="files-btn" id="filesBtn">
-                    <i class="fas fa-folder-open"></i>
-                    <span class="files-ar">التقارير المحفوظة</span>
-                    <span class="files-en" style="display: none;">Saved Reports</span>
-                </button>
-                <button class="save-btn" id="saveBtn">
-                    <i class="fas fa-save"></i>
-                    <span class="save-ar">حفظ ومعاينة التقرير</span>
-                    <span class="save-en" style="display: none;">Save & Preview</span>
-                </button>
+            <div class="action-btns">
+                <button class="action-btn clear-btn" id="clearBtn"><i class="fas fa-eraser"></i> مسح النموذج</button>
+                <button class="action-btn files-btn" id="filesBtn"><i class="fas fa-folder-open"></i> التقارير المحفوظة</button>
+                <button class="action-btn save-btn" id="saveBtn"><i class="fas fa-save"></i> حفظ ومعاينة التقرير</button>
             </div>
         </div>
-        
-        <!-- النماذج (Form 1 و Form 2) - نفس الكود السابق -->
-        <!-- سيتم إضافتها هنا ولكن للاختصار سأكمل بالـ JavaScript المهم -->
-        
+
+        <!-- النموذج الأول - تقرير النصف شهري -->
+        <div id="form1" class="form-container active">
+            <div class="form-header">
+                <div class="form-title">
+                    <h2>تقرير النصف</h2>
+                    <input type="text" id="reportTypeText" placeholder="الأول/الثاني">
+                    <h2>شهر</h2>
+                    <input type="text" id="monthText" placeholder="اسم الشهر">
+                </div>
+            </div>
+
+            <!-- معلومات التقرير -->
+            <div class="report-info">
+                <div class="info-item">
+                    <label>الرقم:</label>
+                    <input type="text" id="reportNum1" placeholder="رقم التقرير">
+                </div>
+                <div class="info-item">
+                    <label>التاريخ:</label>
+                    <input type="date" id="reportDate1">
+                </div>
+            </div>
+
+            <!-- قسم الطقس -->
+            <div class="form-section">
+                <h3 class="section-title">تحديثات معلومات الطقس</h3>
+                <div class="weather-grid">
+                    <div class="weather-box">
+                        <div class="form-group">
+                            <label>الأمطار (ملم):</label>
+                            <input type="number" id="rainfall" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>متوسط درجات الحرارة (°C):</label>
+                            <div class="temp-range">
+                                <input type="number" id="tempMin" placeholder="من" step="0.1">
+                                <span>-</span>
+                                <input type="number" id="tempMax" placeholder="الى" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>متوسط الرطوبة النسبية (%):</label>
+                            <input type="number" id="avgHumidity" min="0" max="100" placeholder="%">
+                        </div>
+                    </div>
+                    <div class="weather-box">
+                        <h4 style="margin-bottom: 15px; color: #555;">تحديثات الشذوذ في حالة الطقس</h4>
+                        <div class="anomaly-item">
+                            <input type="checkbox" id="highTemp">
+                            <label>حرارة مرتفعة:</label>
+                            <input type="text" id="highTempText" placeholder="وصف">
+                        </div>
+                        <div class="anomaly-item">
+                            <input type="checkbox" id="severeCold">
+                            <label>برد شديد:</label>
+                            <input type="text" id="severeColdText" placeholder="وصف">
+                        </div>
+                        <div class="anomaly-item">
+                            <input type="checkbox" id="frost">
+                            <label>صقيع:</label>
+                            <input type="text" id="frostText" placeholder="وصف">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم تتبع الحالة العامة -->
+            <div class="form-section">
+                <h3 class="section-title">تتبع الحالة العامة</h3>
+                
+                <!-- الأشجار المثمرة -->
+                <h4 style="color: #2d5e2d; margin-bottom: 15px;">الأشجار المثمرة</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div class="form-group">
+                        <label>زيتون:</label>
+                        <input type="text" id="olive" placeholder="حالة الزيتون">
+                    </div>
+                    <div class="form-group">
+                        <label>كرمة:</label>
+                        <input type="text" id="vine" placeholder="حالة الكرمة">
+                    </div>
+                </div>
+
+                <!-- المحاصيل الحقلية -->
+                <h4 style="color: #2d5e2d; margin-bottom: 15px;">المحاصيل الحقلية</h4>
+                <div style="margin-bottom: 25px;">
+                    <div class="form-group">
+                        <label>قمح:</label>
+                        <input type="text" id="wheat" placeholder="حالة القمح">
+                    </div>
+                </div>
+
+                <!-- محاصيل الخضار -->
+                <h4 style="color: #2d5e2d; margin-bottom: 15px;">محاصيل الخضار الرئيسة</h4>
+                <div class="form-group">
+                    <textarea id="vegetablesText" rows="4" placeholder="حالة الخضار..."></textarea>
+                </div>
+            </div>
+
+            <!-- قسم الآفات -->
+            <div class="form-section">
+                <h3 class="section-title">الآفات المسجلة نتيجة لأعمال المسح والتحري</h3>
+                
+                <h4 style="color: #2d5e2d; margin: 20px 0 10px;">الأشجار المثمرة</h4>
+                <table class="pests-table">
+                    <thead><tr><th></th></tr></thead>
+                    <tbody>
+                        <tr><td><input type="text" class="fruit-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="fruit-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="fruit-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="fruit-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="fruit-pest" placeholder="اسم الآفة"></td></tr>
+                    </tbody>
+                </table>
+
+                <h4 style="color: #2d5e2d; margin: 30px 0 10px;">المحاصيل الحقلية</h4>
+                <table class="pests-table">
+                    <thead><tr><th></th></tr></thead>
+                    <tbody>
+                        <tr><td><input type="text" class="field-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="field-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="field-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="field-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="field-pest" placeholder="اسم الآفة"></td></tr>
+                    </tbody>
+                </table>
+
+                <h4 style="color: #2d5e2d; margin: 30px 0 10px;">محاصيل الخضار</h4>
+                <table class="pests-table">
+                    <thead><tr><th></th></tr></thead>
+                    <tbody>
+                        <tr><td><input type="text" class="veg-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="veg-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="veg-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="veg-pest" placeholder="اسم الآفة"></td></tr>
+                        <tr><td><input type="text" class="veg-pest" placeholder="اسم الآفة"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- نشاطات الدعم الإرشادي -->
+            <div class="form-section">
+                <h3 class="section-title">نشاطات الدعم الإرشادي</h3>
+                <div class="form-group">
+                    <textarea id="extensionActivities" rows="4" placeholder="النشاطات الإرشادية..."></textarea>
+                </div>
+            </div>
+
+            <!-- إجراءات المكافحة -->
+            <div class="form-section">
+                <h3 class="section-title">إجراءات المكافحة المدعومة</h3>
+                <div class="form-group">
+                    <textarea id="controlMeasures" rows="4" placeholder="إجراءات المكافحة..."></textarea>
+                </div>
+            </div>
+
+            <!-- ملاحظات -->
+            <div class="form-section">
+                <h3 class="section-title">ملاحظات (إجراءات أخرى / صعوبات ومقترحات)</h3>
+                <div class="form-group">
+                    <textarea id="notes" rows="4" placeholder="ملاحظات..."></textarea>
+                </div>
+            </div>
+
+            <!-- التوقيعات -->
+            <div class="signatures">
+                <div class="signature">
+                    <label>فني الوقاية:</label>
+                    <input type="text" id="technician1" placeholder="الاسم">
+                </div>
+                <div class="signature">
+                    <label>رئيس الوحدة الإرشادية:</label>
+                    <input type="text" id="unitHead1" placeholder="الاسم">
+                </div>
+            </div>
+        </div>
+
+        <!-- النموذج الثاني - تقرير قراءة المصائد -->
+        <div id="form2" class="form-container">
+            <div class="form-header">
+                <div class="form-title">
+                    <h2>تقرير قراءة المصائد عن شهر</h2>
+                    <input type="text" id="monthTrapsText" placeholder="الشهر">
+                </div>
+            </div>
+
+            <!-- معلومات التقرير -->
+            <div class="report-info">
+                <div class="info-item">
+                    <label>الرقم:</label>
+                    <input type="text" id="reportNum2" placeholder="رقم التقرير">
+                </div>
+                <div class="info-item">
+                    <label>التاريخ:</label>
+                    <input type="date" id="reportDate2">
+                </div>
+            </div>
+
+            <!-- جدول المصائد -->
+            <div class="form-section">
+                <h3 class="section-title">بيانات المصائد</h3>
+                <table class="traps-table" id="trapsTable">
+                    <thead>
+                        <tr>
+                            <th>اسم الحشرة</th>
+                            <th>تاريخ القراءة</th>
+                            <th>م1</th>
+                            <th>م2</th>
+                            <th>م3</th>
+                            <th>م4</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trapsTableBody">
+                        <!-- JavaScript will populate this -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- التوقيعات -->
+            <div class="signatures">
+                <div class="signature">
+                    <label>فني الوقاية:</label>
+                    <input type="text" id="technician2" placeholder="الاسم">
+                </div>
+                <div class="signature">
+                    <label>رئيس الوحدة الإرشادية:</label>
+                    <input type="text" id="unitHead2" placeholder="الاسم">
+                </div>
+            </div>
+        </div>
+
+        <!-- لوحة التقارير المحفوظة -->
+        <div id="filesPanel" class="files-panel">
+            <div class="files-header">
+                <h2 style="color: #2d5e2d;">التقارير المحفوظة</h2>
+                <button class="action-btn clear-btn" id="closeFilesBtn" style="padding: 8px 15px;">إغلاق</button>
+            </div>
+            <div class="files-list" id="filesList"></div>
+        </div>
     </div>
 
-    <!-- ===== نافذة التحميل المحسنة ===== -->
+    <!-- نافذة التعليمات -->
+    <div id="instructionsModal" class="instructions-modal">
+        <div class="instructions-content">
+            <h2 style="color: #2d5e2d; margin-bottom: 20px;">كيفية استخدام التطبيق</h2>
+            <ol style="margin-right: 20px; line-height: 1.8;">
+                <li>اختر نوع التقرير من التبويبات أعلاه</li>
+                <li>املأ جميع البيانات المطلوبة</li>
+                <li>اضغط على زر "حفظ ومعاينة التقرير"</li>
+                <li>من نافذة المعاينة يمكنك تنزيل PDF أو طباعة التقرير</li>
+                <li>التقارير تحفظ تلقائياً ويمكنك الرجوع إليها لاحقاً</li>
+            </ol>
+            <button onclick="closeInstructions()" style="width: 100%; padding: 10px; margin-top: 20px; background: #2d5e2d; color: white; border: none; border-radius: 5px; cursor: pointer;">فهمت، شكراً</button>
+        </div>
+    </div>
+
+    <!-- زر المساعدة -->
+    <button class="help-btn" id="helpBtn"><i class="fas fa-question"></i></button>
+
+    <!-- نافذة التحميل -->
     <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <div class="loading-spinner-2"></div>
-            <p class="loading-ar">جاري إنشاء ملف PDF...</p>
-            <p class="loading-en" style="display: none;">Creating PDF file...</p>
-            <div class="loading-progress">
-                <div class="loading-progress-bar" id="loadingProgress"></div>
-            </div>
-            <p id="loadingStatus" class="loading-ar">جاري التحميل...</p>
-            <p id="loadingStatus" class="loading-en" style="display: none;">Processing...</p>
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p>جاري إنشاء ملف PDF...</p>
         </div>
     </div>
 
+    <!-- الإشعارات -->
+    <div id="notification" class="notification"></div>
     <script>
-        // ==================== إعدادات التطبيق المحسنة ====================
-        const STORAGE_KEY = 'prevention_reports';
-        let currentLang = 'ar';
-        let currentTheme = 'light';
+    // ==================== المتغيرات العامة ====================
+    const STORAGE_KEY = 'prevention_reports';
+    let currentReportData = null;
+    let currentPreviewWindow = null;
+
+    // ==================== تهيئة التطبيق ====================
+    document.addEventListener('DOMContentLoaded', function() {
+        // تعيين التاريخ الحالي
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('reportDate1').value = today;
+        document.getElementById('reportDate2').value = today;
         
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSettings();
-            document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
-            document.getElementById('lang-toggle').addEventListener('click', toggleLanguage);
-            initApp();
+        // إنشاء جدول المصائد
+        createTrapsTable();
+        
+        // إضافة مستمعي الأحداث
+        document.getElementById('saveBtn').addEventListener('click', saveAndPreview);
+        document.getElementById('clearBtn').addEventListener('click', clearForm);
+        document.getElementById('filesBtn').addEventListener('click', showFilesPanel);
+        document.getElementById('closeFilesBtn').addEventListener('click', closeFilesPanel);
+        document.getElementById('helpBtn').addEventListener('click', showInstructions);
+        
+        // أزرار التبويبات
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchTab(this.getAttribute('data-tab'));
+            });
         });
         
-        function loadSettings() {
-            const savedLang = localStorage.getItem('preferred_language');
-            if (savedLang) {
-                currentLang = savedLang;
-                applyLanguage(currentLang);
-                document.getElementById('lang-toggle').querySelector('.lang-text').textContent = 
-                    currentLang === 'ar' ? 'English' : 'العربية';
-            }
-            
-            const savedTheme = localStorage.getItem('preferred_theme');
-            if (savedTheme) {
-                currentTheme = savedTheme;
-                document.body.setAttribute('data-theme', currentTheme);
-                document.getElementById('theme-toggle').checked = currentTheme === 'dark';
-            }
-        }
+        // شذوذ الطقس
+        setupWeatherAnomalies();
         
-        function toggleTheme() {
-            currentTheme = document.getElementById('theme-toggle').checked ? 'dark' : 'light';
-            document.body.setAttribute('data-theme', currentTheme);
-            localStorage.setItem('preferred_theme', currentTheme);
-            showNotification(
-                currentLang === 'ar' ? 'تم تفعيل الوضع الليلي' : 'Dark mode activated', 
-                'info'
-            );
-        }
+        // تحميل البيانات المحفوظة
+        loadSavedData();
         
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            applyLanguage(currentLang);
-            localStorage.setItem('preferred_language', currentLang);
-            
-            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.documentElement.lang = currentLang;
-            
-            document.getElementById('lang-toggle').querySelector('.lang-text').textContent = 
-                currentLang === 'ar' ? 'English' : 'العربية';
-            
-            updateDateTime();
-            showNotification(
-                currentLang === 'ar' ? 'تم التبديل إلى العربية' : 'Switched to English', 
-                'info'
-            );
-        }
-        
-        function applyLanguage(lang) {
-            const arElements = document.querySelectorAll('[class*="-ar"]:not(input):not(select):not(textarea)');
-            const enElements = document.querySelectorAll('[class*="-en"]:not(input):not(select):not(textarea)');
-            
-            arElements.forEach(el => el.style.display = lang === 'ar' ? '' : 'none');
-            enElements.forEach(el => el.style.display = lang === 'en' ? '' : 'none');
-        }
-        
-        function initApp() {
-            const today = new Date().toISOString().split('T')[0];
-            if (document.getElementById('reportDate1')) 
-                document.getElementById('reportDate1').value = today;
-            if (document.getElementById('reportDate2')) 
-                document.getElementById('reportDate2').value = today;
-            
-            document.getElementById('saveBtn').addEventListener('click', saveAndPreviewReport);
-            document.getElementById('clearBtn').addEventListener('click', clearForm);
-            document.getElementById('filesBtn').addEventListener('click', showFilesPanel);
-            document.getElementById('closeFilesBtn').addEventListener('click', closeFilesPanel);
-            document.getElementById('helpBtn').addEventListener('click', showInstructions);
-            
-            document.querySelectorAll('.tab-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    switchTab(button.getAttribute('data-tab'));
-                });
-            });
-            
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-        }
-        
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            const dateTimeStr = now.toLocaleDateString(
-                currentLang === 'ar' ? 'ar-EG' : 'en-US', 
-                options
-            );
-            document.getElementById('currentDateTime').innerHTML = 
-                `<i class="far fa-calendar-alt"></i> ${dateTimeStr}`;
-        }
-        
-        function showInstructions() {
-            document.getElementById('instructionsModal').style.display = 'flex';
-        }
-        
-        window.closeInstructions = function() {
-            document.getElementById('instructionsModal').style.display = 'none';
+        // تحديث الوقت
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    });
+
+    // ==================== دوال المساعدة ====================
+    function updateDateTime() {
+        const now = new Date();
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
         };
-        
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
-            document.getElementById('filesPanel').classList.remove('active');
-            
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-        
-        function showFilesPanel() {
-            document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('filesPanel').classList.add('active');
-        }
-        
-        function closeFilesPanel() {
-            document.getElementById('filesPanel').classList.remove('active');
-            document.querySelector('[data-tab="form1"]').classList.add('active');
-            document.getElementById('form1').classList.add('active');
-        }
-        
-        function clearForm() {
-            const activeForm = document.querySelector('.form-container.active');
-            if (!activeForm) return;
-            
-            if (confirm(currentLang === 'ar' ? 'مسح جميع البيانات؟' : 'Clear all data?')) {
-                const inputs = activeForm.querySelectorAll('input:not([type="checkbox"]), textarea');
-                inputs.forEach(input => input.value = '');
-                
-                const checkboxes = activeForm.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(cb => cb.checked = false);
-                
-                const dates = activeForm.querySelectorAll('input[type="date"]');
-                dates.forEach(date => date.value = new Date().toISOString().split('T')[0]);
-                
-                showNotification(
-                    currentLang === 'ar' ? 'تم المسح' : 'Cleared', 
-                    'success'
-                );
-            }
-        }
-        
-        // ==================== دوال التنزيل والطباعة المحسنة ====================
-        function saveAndPreviewReport() {
-            try {
-                const activeForm = document.querySelector('.form-container.active');
-                if (!activeForm) return;
-                
-                const formId = activeForm.id;
-                const reportData = formId === 'form1' ? collectForm1Data() : collectForm2Data();
-                
-                let previewHtml = formId === 'form1' 
-                    ? generateForm1PreviewHtml(reportData)
-                    : generateForm2PreviewHtml(reportData);
-                
-                const reportTitle = formId === 'form1' 
-                    ? `تقرير_${reportData.reportNum || 'بدون'}_${reportData.monthText || ''}`
-                    : `مصائد_${reportData.month || ''}_${reportData.reportNum || ''}`;
-                
-                window.currentReportData = {
-                    html: previewHtml,
-                    title: reportTitle,
-                    data: reportData,
-                    type: formId
-                };
-                
-                showPreviewWindow(previewHtml, reportTitle);
-                
-                saveReportToStorage(reportData, formId);
-                
-                showNotification(
-                    currentLang === 'ar' ? 'تم حفظ التقرير' : 'Report saved', 
-                    'success'
-                );
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification(
-                    currentLang === 'ar' ? 'حدث خطأ' : 'Error occurred', 
-                    'error'
-                );
-            }
-        }
-        
-        function showPreviewWindow(html, title) {
-            const previewWindow = document.createElement('div');
-            previewWindow.className = 'preview-window';
-            previewWindow.innerHTML = `
-                <div class="preview-controls">
-                    <button class="preview-btn download-btn-preview" onclick="downloadEnhancedPDF()">
-                        <i class="fas fa-download"></i> 
-                        <span class="preview-download-ar">تنزيل PDF</span>
-                        <span class="preview-download-en" style="display: none;">Download PDF</span>
-                    </button>
-                    <button class="preview-btn print-btn" onclick="printEnhancedReport()">
-                        <i class="fas fa-print"></i>
-                        <span class="preview-print-ar">طباعة</span>
-                        <span class="preview-print-en" style="display: none;">Print</span>
-                    </button>
-                    <button class="preview-btn close-preview-btn" onclick="closePreviewWindow()">
-                        <i class="fas fa-times"></i>
-                        <span class="preview-close-ar">إغلاق</span>
-                        <span class="preview-close-en" style="display: none;">Close</span>
-                    </button>
-                </div>
-                <div class="preview-content" id="previewContent">
-                    ${html}
-                </div>
-            `;
-            
-            document.body.appendChild(previewWindow);
-            window.currentPreviewWindow = previewWindow;
-            
-            // تحديث النصوص حسب اللغة
-            if (currentLang === 'en') {
-                previewWindow.querySelectorAll('.preview-download-ar').forEach(el => el.style.display = 'none');
-                previewWindow.querySelectorAll('.preview-download-en').forEach(el => el.style.display = 'inline');
-                previewWindow.querySelectorAll('.preview-print-ar').forEach(el => el.style.display = 'none');
-                previewWindow.querySelectorAll('.preview-print-en').forEach(el => el.style.display = 'inline');
-                previewWindow.querySelectorAll('.preview-close-ar').forEach(el => el.style.display = 'none');
-                previewWindow.querySelectorAll('.preview-close-en').forEach(el => el.style.display = 'inline');
-            }
-        }
-        
-        window.closePreviewWindow = function() {
-            if (window.currentPreviewWindow) {
-                window.currentPreviewWindow.remove();
-                window.currentPreviewWindow = null;
-                window.currentReportData = null;
-            }
-        };
-        
-        // ==================== دالة تنزيل PDF المحسنة مع شريط التقدم ====================
-        window.downloadEnhancedPDF = function() {
-            if (!window.currentReportData) {
-                showNotification(
-                    currentLang === 'ar' ? 'لا توجد بيانات' : 'No data', 
-                    'error'
-                );
-                return;
-            }
-            
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const progressBar = document.getElementById('loadingProgress');
-            const loadingStatus = document.getElementById('loadingStatus');
-            
-            loadingOverlay.style.display = 'flex';
-            progressBar.style.width = '0%';
-            
-            if (currentLang === 'ar') {
-                loadingStatus.textContent = 'جاري تحضير المستند...';
-            } else {
-                loadingStatus.textContent = 'Preparing document...';
-            }
-            
-            const element = document.getElementById('previewContent');
-            
-            // خيارات متقدمة لتحسين جودة PDF
-            const opt = {
-                margin: [15, 15, 15, 15],
-                filename: `${window.currentReportData.title}.pdf`,
-                image: { 
-                    type: 'jpeg', 
-                    quality: 0.98 
-                },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    logging: true,
-                    letterRendering: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff'
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait',
-                    compress: true
-                },
-                pagebreak: { 
-                    mode: ['css', 'legacy'],
-                    before: '.page-break',
-                    after: ['#after1', '#after2'],
-                    avoid: 'img'
-                }
-            };
-            
-            // محاكاة شريط التقدم
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 10;
-                if (progress <= 90) {
-                    progressBar.style.width = progress + '%';
-                    
-                    if (currentLang === 'ar') {
-                        loadingStatus.textContent = `جاري إنشاء PDF... ${progress}%`;
-                    } else {
-                        loadingStatus.textContent = `Creating PDF... ${progress}%`;
-                    }
-                }
-            }, 300);
-            
-            // إنشاء PDF مع تحسين الجودة
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save()
-                    .then(() => {
-                        clearInterval(progressInterval);
-                        progressBar.style.width = '100%';
-                        
-                        if (currentLang === 'ar') {
-                            loadingStatus.textContent = 'تم الإنشاء بنجاح!';
-                        } else {
-                            loadingStatus.textContent = 'Created successfully!';
-                        }
-                        
-                        setTimeout(() => {
-                            loadingOverlay.style.display = 'none';
-                            showNotification(
-                                currentLang === 'ar' ? 'تم تنزيل PDF' : 'PDF downloaded', 
-                                'success'
-                            );
-                        }, 1000);
-                    })
-                    .catch(error => {
-                        clearInterval(progressInterval);
-                        loadingOverlay.style.display = 'none';
-                        console.error('PDF Error:', error);
-                        
-                        showNotification(
-                            currentLang === 'ar' ? 'خطأ في إنشاء PDF' : 'PDF creation failed', 
-                            'error'
-                        );
-                        
-                        // محاولة الطباعة كبديل
-                        if (confirm(
-                            currentLang === 'ar' ? 
-                            'هل تريد الطباعة بدلاً من ذلك؟' : 
-                            'Would you like to print instead?'
-                        )) {
-                            printEnhancedReport();
-                        }
-                    });
-            }, 500);
-        };
-        
-        // ==================== دالة الطباعة المحسنة ====================
-        window.printEnhancedReport = function() {
-            if (!window.currentReportData) {
-                showNotification(
-                    currentLang === 'ar' ? 'لا توجد بيانات' : 'No data', 
-                    'error'
-                );
-                return;
-            }
-            
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const progressBar = document.getElementById('loadingProgress');
-            const loadingStatus = document.getElementById('loadingStatus');
-            
-            loadingOverlay.style.display = 'flex';
-            progressBar.style.width = '50%';
-            
-            if (currentLang === 'ar') {
-                loadingStatus.textContent = 'جاري تحضير الطباعة...';
-            } else {
-                loadingStatus.textContent = 'Preparing print...';
-            }
-            
-            // إنشاء نافذة طباعة منفصلة
-            setTimeout(() => {
-                const printWindow = window.open('', '_blank');
-                
-                // إضافة أنماط خاصة للطباعة
-                const printStyles = `
-                    <style>
-                        * { font-family: 'Segoe UI', Tahoma, sans-serif; }
-                        body { 
-                            padding: 20mm; 
-                            color: #333; 
-                            line-height: 1.6;
-                            direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'};
-                        }
-                        .preview-header { 
-                            text-align: center; 
-                            margin-bottom: 30px; 
-                            padding-bottom: 20px; 
-                            border-bottom: 3px solid #2d5e2d; 
-                        }
-                        .preview-header h1 { color: #2d5e2d; }
-                        .preview-section { 
-                            margin-bottom: 25px; 
-                            padding: 20px; 
-                            border: 1px solid #ddd; 
-                            border-${currentLang === 'ar' ? 'right' : 'left'}: 4px solid #2d5e2d;
-                            background-color: #f9fdf9; 
-                            border-radius: 8px; 
-                            page-break-inside: avoid; 
-                        }
-                        .preview-table { 
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            page-break-inside: avoid; 
-                        }
-                        .preview-table th { 
-                            background-color: #2d5e2d; 
-                            color: white; 
-                            padding: 10px; 
-                        }
-                        .preview-table td { 
-                            padding: 10px; 
-                            border: 1px solid #ddd; 
-                        }
-                        .preview-signatures { 
-                            display: flex; 
-                            justify-content: space-between; 
-                            margin-top: 50px; 
-                            page-break-inside: avoid; 
-                        }
-                        @media print {
-                            body { padding: 10mm; }
-                            .preview-section { break-inside: avoid; }
-                        }
-                    </style>
-                `;
-                
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html lang="${currentLang}" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>${window.currentReportData.title}</title>
-                        ${printStyles}
-                    </head>
-                    <body>
-                        ${window.currentReportData.html}
-                        <p style="text-align: center; margin-top: 50px; color: #666;">
-                            ${currentLang === 'ar' ? 'تم الطباعة بواسطة تطبيق تقارير الوقاية' : 'Printed by Prevention Reports App'}
-                        </p>
-                    </body>
-                    </html>
-                `);
-                
-                printWindow.document.close();
-                progressBar.style.width = '100%';
-                
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                    printWindow.focus();
-                    printWindow.print();
-                }, 500);
-            }, 300);
-        };
-        
-        // ==================== دوال جمع البيانات (مختصرة) ====================
-        function collectForm1Data() {
-            return {
-                reportNum: document.getElementById('reportNum1')?.value || '',
-                reportDate: document.getElementById('reportDate1')?.value || '',
-                reportTypeText: document.getElementById('reportTypeText')?.value || '',
-                monthText: document.getElementById('monthText')?.value || '',
-                rainfall: document.getElementById('rainfall')?.value || '',
-                tempMin: document.getElementById('tempMin')?.value || '',
-                tempMax: document.getElementById('tempMax')?.value || '',
-                avgHumidity: document.getElementById('avgHumidity')?.value || '',
-                weatherAnomalies: {
-                    highTemp: document.getElementById('highTemp')?.checked || false,
-                    highTempText: document.getElementById('highTempText')?.value || '',
-                    severeCold: document.getElementById('severeCold')?.checked || false,
-                    severeColdText: document.getElementById('severeColdText')?.value || '',
-                    frost: document.getElementById('frost')?.checked || false,
-                    frostText: document.getElementById('frostText')?.value || ''
-                },
-                oliveStatus: document.getElementById('olive')?.value || '',
-                vineStatus: document.getElementById('vine')?.value || '',
-                wheatStatus: document.getElementById('wheat')?.value || '',
-                vegetablesText: document.getElementById('vegetablesText')?.value || '',
-                extensionActivities: document.getElementById('extensionActivities')?.value || '',
-                controlMeasures: document.getElementById('controlMeasures')?.value || '',
-                notes: document.getElementById('notes')?.value || '',
-                technician: document.getElementById('technician1')?.value || '',
-                unitHead: document.getElementById('unitHead1')?.value || '',
-                fruitPests: [],
-                fieldPests: [],
-                vegetablePests: []
-            };
-        }
-        
-        function collectForm2Data() {
-            return {
-                reportNum: document.getElementById('reportNum2')?.value || '',
-                reportDate: document.getElementById('reportDate2')?.value || '',
-                month: document.getElementById('monthTrapsText')?.value || '',
-                technician: document.getElementById('technician2')?.value || '',
-                unitHead: document.getElementById('unitHead2')?.value || '',
-                traps: []
-            };
-        }
-        
-        // ==================== دوال توليد HTML للمعاينة المحسنة ====================
-        function generateForm1PreviewHtml(data) {
-            function formatDate(date) {
-                if (!date) return currentLang === 'ar' ? 'غير محدد' : 'Not set';
-                return new Date(date).toLocaleDateString(
-                    currentLang === 'ar' ? 'ar-EG' : 'en-US',
-                    { year: 'numeric', month: 'long', day: 'numeric' }
-                );
-            }
-            
-            return `
-                <div class="preview-header">
-                    <h1>${currentLang === 'ar' ? 'تقرير الوقاية الشامل' : 'Comprehensive Prevention Report'}</h1>
-                    <p>${currentLang === 'ar' ? 'وزارة الزراعة - دائرة الوقاية' : 'Ministry of Agriculture - Prevention Department'}</p>
-                </div>
-                
-                <div class="preview-section">
-                    <h3 class="preview-section-title">
-                        <i class="fas fa-info-circle"></i> 
-                        ${currentLang === 'ar' ? 'معلومات التقرير' : 'Report Information'}
-                    </h3>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 8px; background: var(--accent-light);"><strong>${currentLang === 'ar' ? 'رقم التقرير' : 'Report No.'}:</strong></td>
-                            <td style="padding: 8px;">${data.reportNum || '______'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; background: var(--accent-light);"><strong>${currentLang === 'ar' ? 'التاريخ' : 'Date'}:</strong></td>
-                            <td style="padding: 8px;">${formatDate(data.reportDate)}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; background: var(--accent-light);"><strong>${currentLang === 'ar' ? 'الفترة' : 'Period'}:</strong></td>
-                            <td style="padding: 8px;">${data.reportTypeText || ''} - ${data.monthText || ''}</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div class="preview-section">
-                    <h3 class="preview-section-title">
-                        <i class="fas fa-cloud-sun-rain"></i> 
-                        ${currentLang === 'ar' ? 'البيانات الجوية' : 'Weather Data'}
-                    </h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div>
-                            <p><strong>${currentLang === 'ar' ? 'الأمطار' : 'Rainfall'}:</strong> ${data.rainfall || '0'} mm</p>
-                            <p><strong>${currentLang === 'ar' ? 'الحرارة الصغرى' : 'Min Temp'}:</strong> ${data.tempMin || '0'} °C</p>
-                            <p><strong>${currentLang === 'ar' ? 'الحرارة العظمى' : 'Max Temp'}:</strong> ${data.tempMax || '0'} °C</p>
-                        </div>
-                        <div>
-                            <p><strong>${currentLang === 'ar' ? 'الرطوبة' : 'Humidity'}:</strong> ${data.avgHumidity || '0'}%</p>
-                            ${data.weatherAnomalies.highTemp ? `<p><strong>${currentLang === 'ar' ? 'حرارة مرتفعة' : 'High Temp'}:</strong> ${data.weatherAnomalies.highTempText}</p>` : ''}
-                            ${data.weatherAnomalies.severeCold ? `<p><strong>${currentLang === 'ar' ? 'برد شديد' : 'Severe Cold'}:</strong> ${data.weatherAnomalies.severeColdText}</p>` : ''}
-                            ${data.weatherAnomalies.frost ? `<p><strong>${currentLang === 'ar' ? 'صقيع' : 'Frost'}:</strong> ${data.weatherAnomalies.frostText}</p>` : ''}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="preview-section">
-                    <h3 class="preview-section-title">
-                        <i class="fas fa-seedling"></i> 
-                        ${currentLang === 'ar' ? 'الحالة العامة للمحاصيل' : 'General Crop Status'}
-                    </h3>
-                    <table class="preview-table">
-                        <tr>
-                            <th>${currentLang === 'ar' ? 'المحصول' : 'Crop'}</th>
-                            <th>${currentLang === 'ar' ? 'الحالة' : 'Status'}</th>
-                        </tr>
-                        <tr><td><strong>${currentLang === 'ar' ? 'زيتون' : 'Olive'}</strong></td><td>${data.oliveStatus || '---'}</td></tr>
-                        <tr><td><strong>${currentLang === 'ar' ? 'كرمة' : 'Vine'}</strong></td><td>${data.vineStatus || '---'}</td></tr>
-                        <tr><td><strong>${currentLang === 'ar' ? 'قمح' : 'Wheat'}</strong></td><td>${data.wheatStatus || '---'}</td></tr>
-                    </table>
-                    <p><strong>${currentLang === 'ar' ? 'الخضار' : 'Vegetables'}:</strong> ${data.vegetablesText || '---'}</p>
-                </div>
-                
-                <div class="preview-section">
-                    <h3 class="preview-section-title">
-                        <i class="fas fa-bug"></i> 
-                        ${currentLang === 'ar' ? 'الأنشطة والإجراءات' : 'Activities & Procedures'}
-                    </h3>
-                    <p><strong>${currentLang === 'ar' ? 'الدعم الإرشادي' : 'Extension'}:</strong> ${data.extensionActivities || '---'}</p>
-                    <p><strong>${currentLang === 'ar' ? 'إجراءات المكافحة' : 'Control'}:</strong> ${data.controlMeasures || '---'}</p>
-                    <p><strong>${currentLang === 'ar' ? 'ملاحظات' : 'Notes'}:</strong> ${data.notes || '---'}</p>
-                </div>
-                
-                <div class="preview-signatures">
-                    <div class="preview-signature">
-                        <h4>${currentLang === 'ar' ? 'فني الوقاية' : 'Technician'}</h4>
-                        <div class="signature-line">${data.technician || '________________'}</div>
-                    </div>
-                    <div class="preview-signature">
-                        <h4>${currentLang === 'ar' ? 'رئيس الوحدة' : 'Unit Head'}</h4>
-                        <div class="signature-line">${data.unitHead || '________________'}</div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; color: #666; font-size: 12px;">
-                    <p>${currentLang === 'ar' ? 'تقرير معتمد - جميع الحقوق محفوظة' : 'Official Report - All Rights Reserved'}</p>
-                </div>
-            `;
-        }
-        
-        function generateForm2PreviewHtml(data) {
-            return `
-                <div class="preview-header">
-                    <h1>${currentLang === 'ar' ? 'تقرير قراءة المصائد' : 'Traps Reading Report'}</h1>
-                    <p>${currentLang === 'ar' ? 'متابعة الحشرات والآفات' : 'Insect & Pest Monitoring'}</p>
-                </div>
-                
-                <div class="preview-section">
-                    <h3 class="preview-section-title">
-                        <i class="fas fa-info-circle"></i> 
-                        ${currentLang === 'ar' ? 'معلومات التقرير' : 'Report Information'}
-                    </h3>
-                    <table style="width: 100%;">
-                        <tr>
-                            <td><strong>${currentLang === 'ar' ? 'الرقم' : 'No.'}:</strong> ${data.reportNum || '______'}</td>
-                            <td><strong>${currentLang === 'ar' ? 'التاريخ' : 'Date'}:</strong> ${new Date(data.reportDate).toLocaleDateString()}</td>
-                            <td><strong>${currentLang === 'ar' ? 'الشهر' : 'Month'}:</strong> ${data.month || '______'}</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div class="preview-section">
-                    <h3 class="preview-section-title">
-                        <i class="fas fa-chart-bar"></i> 
-                        ${currentLang === 'ar' ? 'نتائج القراءة' : 'Reading Results'}
-                    </h3>
-                    <table class="preview-table">
-                        <thead>
-                            <tr>
-                                <th>${currentLang === 'ar' ? 'اسم الحشرة' : 'Insect'}</th>
-                                <th>${currentLang === 'ar' ? 'التاريخ' : 'Date'}</th>
-                                <th>م1/T1</th>
-                                <th>م2/T2</th>
-                                <th>م3/T3</th>
-                                <th>م4/T4</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td colspan="6" style="text-align: center;">${currentLang === 'ar' ? 'لا توجد بيانات' : 'No data'}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="preview-signatures">
-                    <div class="preview-signature">
-                        <h4>${currentLang === 'ar' ? 'فني الوقاية' : 'Technician'}</h4>
-                        <div class="signature-line">${data.technician || '________________'}</div>
-                    </div>
-                    <div class="preview-signature">
-                        <h4>${currentLang === 'ar' ? 'رئيس الوحدة' : 'Unit Head'}</h4>
-                        <div class="signature-line">${data.unitHead || '________________'}</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // ==================== دوال التخزين المحلي ====================
-        function saveReportToStorage(reportData, formType) {
-            const reports = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            
-            const reportName = formType === 'form1' 
-                ? `تقرير ${reportData.reportNum || ''} - ${reportData.monthText || ''}`
-                : `مصائد ${reportData.month || ''}`;
-            
-            reports.push({
-                id: Date.now(),
-                name: reportName,
-                type: formType,
-                date: new Date().toISOString(),
-                data: reportData
-            });
-            
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
-        }
-        
-        // ==================== دالة الإشعارات ====================
-        function showNotification(message, type) {
-            let notification = document.getElementById('notification');
-            
-            if (!notification) {
-                notification = document.createElement('div');
-                notification.id = 'notification';
-                notification.className = 'notification';
-                document.body.appendChild(notification);
-            }
-            
-            notification.textContent = message;
-            notification.style.backgroundColor = 
-                type === 'error' ? '#f44336' : 
-                type === 'info' ? '#3a7bd5' : 
-                '#2d5e2d';
-            
-            notification.style.display = 'block';
-            notification.style.animation = 'slideIn 0.5s ease';
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.5s ease';
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 400);
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
-<!-- ===== استكمال النماذج المفقودة من الجزء الثاني ===== -->
-<!-- نموذج التقرير النصفي الكامل -->
-<div id="form1" class="form-container active" style="display: block;">
-    <div class="form-header">
-        <div class="form-title-with-input">
-            <h2 class="form-title form-title-ar">تقرير النصف</h2>
-            <h2 class="form-title form-title-en" style="display: none;">Bi-Weekly Report</h2>
-            <input type="text" id="reportTypeText" class="form-title-input" placeholder="الأول/الثاني">
-            <h2 class="form-title month-title-ar">شهر</h2>
-            <h2 class="form-title month-title-en" style="display: none;">Month</h2>
-            <input type="text" id="monthText" class="form-title-input" placeholder="اسم الشهر">
-        </div>
-    </div>
-    
-    <div class="report-header-info">
-        <div class="report-number-row">
-            <label for="reportNum1" class="report-num-ar">الرقم:</label>
-            <label for="reportNum1" class="report-num-en" style="display: none;">Number:</label>
-            <input type="text" id="reportNum1" style="width: 200px;" placeholder="رقم التقرير">
-        </div>
-        <div class="report-date-row">
-            <label for="reportDate1" class="date-ar">التاريخ:</label>
-            <label for="reportDate1" class="date-en" style="display: none;">Date:</label>
-            <input type="date" id="reportDate1" style="width: 200px;">
-        </div>
-    </div>
-    
-    <!-- قسم الطقس -->
-    <div class="form-section">
-        <h3 class="section-title weather-ar">🌤️ تحديثات معلومات الطقس</h3>
-        <h3 class="section-title weather-en" style="display: none;">🌤️ Weather Updates</h3>
-        <div class="weather-grid">
-            <div class="weather-left">
-                <div class="form-group">
-                    <label for="rainfall" class="rain-ar">☔ الأمطار (ملم):</label>
-                    <label for="rainfall" class="rain-en" style="display: none;">☔ Rainfall (mm):</label>
-                    <input type="number" id="rainfall" step="0.1" min="0" placeholder="0.0">
-                </div>
-                <div class="form-group">
-                    <label for="avgTemp" class="temp-ar">🌡️ متوسط درجات الحرارة (°C):</label>
-                    <label for="avgTemp" class="temp-en" style="display: none;">🌡️ Average Temperature (°C):</label>
-                    <div class="temp-range-input" style="display: flex; gap: 5px;">
-                        <input type="number" id="tempMin" placeholder="من" step="0.1">
-                        <span>-</span>
-                        <input type="number" id="tempMax" placeholder="الى" step="0.1">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="avgHumidity" class="humidity-ar">💧 متوسط الرطوبة النسبية (%):</label>
-                    <label for="avgHumidity" class="humidity-en" style="display: none;">💧 Average Humidity (%):</label>
-                    <input type="number" id="avgHumidity" min="0" max="100" placeholder="%">
-                </div>
-            </div>
-            <div class="weather-right">
-                <h4 class="anomaly-ar">⚠️ الشذوذ في حالة الطقس</h4>
-                <h4 class="anomaly-en" style="display: none;">⚠️ Weather Anomalies</h4>
-                <div class="weather-anomaly">
-                    <input type="checkbox" id="highTemp">
-                    <label for="highTemp" class="high-temp-ar">🔥 حرارة مرتفعة:</label>
-                    <label for="highTemp" class="high-temp-en" style="display: none;">🔥 High Temperature:</label>
-                    <input type="text" id="highTempText" placeholder="وصف">
-                </div>
-                <div class="weather-anomaly">
-                    <input type="checkbox" id="severeCold">
-                    <label for="severeCold" class="cold-ar">❄️ برد شديد:</label>
-                    <label for="severeCold" class="cold-en" style="display: none;">❄️ Severe Cold:</label>
-                    <input type="text" id="severeColdText" placeholder="وصف">
-                </div>
-                <div class="weather-anomaly">
-                    <input type="checkbox" id="frost">
-                    <label for="frost" class="frost-ar">🧊 صقيع:</label>
-                    <label for="frost" class="frost-en" style="display: none;">🧊 Frost:</label>
-                    <input type="text" id="frostText" placeholder="وصف">
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- قسم تتبع الحالة العامة -->
-    <div class="form-section">
-        <h3 class="section-title general-ar">🌳 تتبع الحالة العامة</h3>
-        <h3 class="section-title general-en" style="display: none;">🌳 General Status Tracking</h3>
-        
-        <div style="margin-bottom: 25px;">
-            <h4 class="sub-section-title fruit-trees-ar">🍈 الأشجار المثمرة</h4>
-            <h4 class="sub-section-title fruit-trees-en" style="display: none;">🍈 Fruit Trees</h4>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="olive" class="olive-ar">زيتون:</label>
-                    <label for="olive" class="olive-en" style="display: none;">Olive:</label>
-                    <input type="text" id="olive" placeholder="حالة الزيتون...">
-                </div>
-                <div class="form-group">
-                    <label for="vine" class="vine-ar">كرمة:</label>
-                    <label for="vine" class="vine-en" style="display: none;">Vine:</label>
-                    <input type="text" id="vine" placeholder="حالة الكرمة...">
-                </div>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 25px;">
-            <h4 class="sub-section-title field-crops-ar">🌾 المحاصيل الحقلية</h4>
-            <h4 class="sub-section-title field-crops-en" style="display: none;">🌾 Field Crops</h4>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="wheat" class="wheat-ar">قمح:</label>
-                    <label for="wheat" class="wheat-en" style="display: none;">Wheat:</label>
-                    <input type="text" id="wheat" placeholder="حالة القمح...">
-                </div>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <h4 class="sub-section-title vegetables-ar">🥬 محاصيل الخضار الرئيسة</h4>
-            <h4 class="sub-section-title vegetables-en" style="display: none;">🥬 Main Vegetables</h4>
-            <div class="form-group">
-                <textarea id="vegetablesText" class="vegetables-textarea" rows="4" placeholder="اكتب هنا عن حالة الخضار..."></textarea>
-            </div>
-        </div>
-    </div>
-    
-    <!-- قسم الآفات -->
-    <div class="form-section">
-        <h3 class="section-title pests-ar">🐛 الآفات المسجلة</h3>
-        <h3 class="section-title pests-en" style="display: none;">🐛 Recorded Pests</h3>
-        
-        <h4 style="margin: 20px 0 10px; color: var(--text-secondary);" class="fruit-pests-ar">🍈 الأشجار المثمرة</h4>
-        <h4 style="margin: 20px 0 10px; color: var(--text-secondary);" class="fruit-pests-en" style="display: none;">🍈 Fruit Trees</h4>
-        <table class="pests-table" id="fruitPestsTable">
-            <thead><tr><th></th></tr></thead>
-            <tbody id="fruitPestsBody">
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-            </tbody>
-        </table>
-        
-        <h4 style="margin: 30px 0 10px; color: var(--text-secondary);" class="field-pests-ar">🌾 المحاصيل الحقلية</h4>
-        <h4 style="margin: 30px 0 10px; color: var(--text-secondary);" class="field-pests-en" style="display: none;">🌾 Field Crops</h4>
-        <table class="pests-table" id="fieldPestsTable">
-            <thead><tr><th></th></tr></thead>
-            <tbody id="fieldPestsBody">
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-            </tbody>
-        </table>
-        
-        <h4 style="margin: 30px 0 10px; color: var(--text-secondary);" class="veg-pests-ar">🥬 محاصيل الخضار</h4>
-        <h4 style="margin: 30px 0 10px; color: var(--text-secondary);" class="veg-pests-en" style="display: none;">🥬 Vegetables</h4>
-        <table class="pests-table" id="vegetablePestsTable">
-            <thead><tr><th></th></tr></thead>
-            <tbody id="vegetablePestsBody">
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-                <tr><td><input type="text" class="pest-name" placeholder="اسم الآفة"></td></tr>
-            </tbody>
-        </table>
-    </div>
-    
-    <!-- نشاطات الدعم الإرشادي -->
-    <div class="form-section">
-        <h3 class="section-title extension-ar">📋 نشاطات الدعم الإرشادي</h3>
-        <h3 class="section-title extension-en" style="display: none;">📋 Extension Activities</h3>
-        <div class="form-group">
-            <textarea id="extensionActivities" rows="4" placeholder="النشاطات الإرشادية..."></textarea>
-        </div>
-    </div>
-    
-    <!-- إجراءات المكافحة -->
-    <div class="form-section">
-        <h3 class="section-title control-ar">⚔️ إجراءات المكافحة المدعومة</h3>
-        <h3 class="section-title control-en" style="display: none;">⚔️ Control Measures</h3>
-        <div class="form-group">
-            <textarea id="controlMeasures" rows="4" placeholder="إجراءات المكافحة..."></textarea>
-        </div>
-    </div>
-    
-    <!-- ملاحظات -->
-    <div class="form-section">
-        <h3 class="section-title notes-ar">📝 ملاحظات</h3>
-        <h3 class="section-title notes-en" style="display: none;">📝 Notes</h3>
-        <div class="form-group">
-            <textarea id="notes" rows="4" placeholder="ملاحظات إضافية..."></textarea>
-        </div>
-    </div>
-    
-    <!-- التوقيعات -->
-    <div class="signature-row">
-        <div class="signature">
-            <label for="technician1" class="tech-ar">👤 فني الوقاية:</label>
-            <label for="technician1" class="tech-en" style="display: none;">👤 Technician:</label>
-            <input type="text" id="technician1" placeholder="الاسم">
-        </div>
-        <div class="signature">
-            <label for="unitHead1" class="head-ar">👤 رئيس الوحدة:</label>
-            <label for="unitHead1" class="head-en" style="display: none;">👤 Unit Head:</label>
-            <input type="text" id="unitHead1" placeholder="الاسم">
-        </div>
-    </div>
-</div>
+        document.getElementById('currentDateTime').innerHTML = 
+            `<i class="far fa-calendar-alt"></i> ${now.toLocaleDateString('ar-EG', options)}`;
+    }
 
-<!-- نموذج تقرير المصائد -->
-<div id="form2" class="form-container">
-    <div class="form-header">
-        <div class="form-title-with-input">
-            <h2 class="form-title traps-title-ar">📊 تقرير قراءة المصائد عن شهر</h2>
-            <h2 class="form-title traps-title-en" style="display: none;">📊 Traps Reading Report for Month</h2>
-            <input type="text" id="monthTrapsText" class="form-title-input" placeholder="الشهر">
-        </div>
-    </div>
-    
-    <div class="report-header-info">
-        <div class="report-number-row">
-            <label for="reportNum2" class="report-num-ar">الرقم:</label>
-            <label for="reportNum2" class="report-num-en" style="display: none;">Number:</label>
-            <input type="text" id="reportNum2" style="width: 200px;" placeholder="رقم التقرير">
-        </div>
-        <div class="report-date-row">
-            <label for="reportDate2" class="date-ar">التاريخ:</label>
-            <label for="reportDate2" class="date-en" style="display: none;">Date:</label>
-            <input type="date" id="reportDate2" style="width: 200px;">
-        </div>
-    </div>
-    
-    <div class="form-section">
-        <h3 class="section-title traps-data-ar">🔍 بيانات المصائد</h3>
-        <h3 class="section-title traps-data-en" style="display: none;">🔍 Traps Data</h3>
-        
-        <table class="traps-table" id="trapsTable">
-            <thead>
-                <tr>
-                    <th width="20%">🐛 اسم الحشرة</th>
-                    <th width="20%">📅 تاريخ القراءة</th>
-                    <th width="15%">م1/T1</th>
-                    <th width="15%">م2/T2</th>
-                    <th width="15%">م3/T3</th>
-                    <th width="15%">م4/T4</th>
-                </tr>
-            </thead>
-            <tbody id="trapsTableBody">
-                <!-- سيتم إنشاء الصفوف بواسطة JavaScript -->
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="signature-row">
-        <div class="signature">
-            <label for="technician2" class="tech-ar">👤 فني الوقاية:</label>
-            <label for="technician2" class="tech-en" style="display: none;">👤 Technician:</label>
-            <input type="text" id="technician2" placeholder="الاسم">
-        </div>
-        <div class="signature">
-            <label for="unitHead2" class="head-ar">👤 رئيس الوحدة:</label>
-            <label for="unitHead2" class="head-en" style="display: none;">👤 Unit Head:</label>
-            <input type="text" id="unitHead2" placeholder="الاسم">
-        </div>
-    </div>
-</div>
-
-<!-- لوحة التقارير المحفوظة -->
-<div id="filesPanel" class="files-panel">
-    <div class="files-header">
-        <h2 class="files-title files-title-ar">📁 التقارير المحفوظة</h2>
-        <h2 class="files-title files-title-en" style="display: none;">📁 Saved Reports</h2>
-        <button class="close-files-btn" id="closeFilesBtn">
-            <i class="fas fa-times"></i>
-            <span class="close-ar">إغلاق</span>
-            <span class="close-en" style="display: none;">Close</span>
-        </button>
-    </div>
-    <div class="files-list" id="filesList"></div>
-</div>
-
-<!-- نافذة التعليمات -->
-<div id="instructionsModal" class="instructions-modal">
-    <div class="instructions-content">
-        <h2 class="instructions-title-ar">📚 كيفية استخدام التطبيق</h2>
-        <h2 class="instructions-title-en" style="display: none;">📚 How to Use the App</h2>
-        <div style="text-align: right;">
-            <p><strong class="steps-ar">📋 خطوات العمل:</strong>
-               <strong class="steps-en" style="display: none;">📋 Steps:</strong></p>
-            <ol class="steps-list-ar">
-                <li>اختر نوع التقرير (نصفي أو مصائد)</li>
-                <li>املأ جميع البيانات المطلوبة</li>
-                <li>اضغط على "حفظ ومعاينة"</li>
-                <li>استخدم أزرار PDF أو الطباعة</li>
-                <li>يمكنك حفظ التقارير والعودة لها لاحقاً</li>
-            </ol>
-            <ol class="steps-list-en" style="display: none;">
-                <li>Choose report type (Bi-Weekly or Traps)</li>
-                <li>Fill all required data</li>
-                <li>Click "Save & Preview"</li>
-                <li>Use PDF or Print buttons</li>
-                <li>Reports are saved for later access</li>
-            </ol>
-            
-            <div style="background-color: var(--accent-light); padding: 15px; border-radius: 5px; margin-top: 15px;">
-                <p><i class="fas fa-lightbulb" style="color: var(--warning-color);"></i> 
-                <span class="tip-ar">💡 نصائح: يمكنك تبديل الثيم واللغة من الأعلى</span>
-                <span class="tip-en" style="display: none;">💡 Tips: Switch theme and language from the top</span></p>
-            </div>
-            
-            <button onclick="closeInstructions()" class="close-instructions-btn">
-                <i class="fas fa-check"></i>
-                <span class="got-it-ar">فهمت، شكراً</span>
-                <span class="got-it-en" style="display: none;">Got it, thanks</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- زر المساعدة -->
-<button class="help-btn" id="helpBtn">
-    <i class="fas fa-question-circle"></i>
-</button>
-
-<!-- إضافة JavaScript إضافي لإنشاء صفوف جدول المصائد -->
-<script>
-    // دالة إنشاء صفوف جدول المصائد
-    function createTrapTableRows() {
-        const tableBody = document.getElementById('trapsTableBody');
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = '';
-        
-        for (let i = 0; i < 15; i++) {
+    function createTrapsTable() {
+        const tbody = document.getElementById('trapsTableBody');
+        tbody.innerHTML = '';
+        for (let i = 0; i < 20; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><input type="text" class="insect-name" placeholder="${currentLang === 'ar' ? 'اسم الحشرة' : 'Insect name'}"></td>
+                <td><input type="text" class="insect-name" placeholder="اسم الحشرة"></td>
                 <td><input type="date" class="reading-date"></td>
-                <td><input type="number" class="trap-count" placeholder="0" min="0" step="1"></td>
-                <td><input type="number" class="trap-count" placeholder="0" min="0" step="1"></td>
-                <td><input type="number" class="trap-count" placeholder="0" min="0" step="1"></td>
-                <td><input type="number" class="trap-count" placeholder="0" min="0" step="1"></td>
+                <td><input type="number" class="trap-count" placeholder="0"></td>
+                <td><input type="number" class="trap-count" placeholder="0"></td>
+                <td><input type="number" class="trap-count" placeholder="0"></td>
+                <td><input type="number" class="trap-count" placeholder="0"></td>
             `;
-            tableBody.appendChild(row);
+            tbody.appendChild(row);
         }
     }
-    
-    // استدعاء الدالة بعد تحميل الصفحة
-    setTimeout(createTrapTableRows, 100);
-    
-    // تحسين دالة جمع بيانات النموذج 2
+
+    function setupWeatherAnomalies() {
+        const anomalies = [
+            { checkbox: 'highTemp', text: 'highTempText' },
+            { checkbox: 'severeCold', text: 'severeColdText' },
+            { checkbox: 'frost', text: 'frostText' }
+        ];
+        
+        anomalies.forEach(item => {
+            const checkbox = document.getElementById(item.checkbox);
+            const textField = document.getElementById(item.text);
+            
+            checkbox.addEventListener('change', function() {
+                textField.disabled = !this.checked;
+                if (!this.checked) textField.value = '';
+            });
+            
+            textField.disabled = true;
+        });
+    }
+
+    // ==================== التبويبات ====================
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
+        document.getElementById('filesPanel').classList.remove('active');
+        
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    // ==================== مسح النموذج ====================
+    function clearForm() {
+        if (!confirm('هل أنت متأكد من مسح جميع البيانات؟')) return;
+        
+        const activeForm = document.querySelector('.form-container.active');
+        if (!activeForm) return;
+        
+        // مسح جميع الحقول
+        activeForm.querySelectorAll('input:not([type="checkbox"]), textarea').forEach(input => {
+            if (input.type === 'date') {
+                input.value = new Date().toISOString().split('T')[0];
+            } else {
+                input.value = '';
+            }
+        });
+        
+        activeForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        
+        // تعطيل حقول الشذوذ
+        ['highTempText', 'severeColdText', 'frostText'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = '';
+                el.disabled = true;
+            }
+        });
+        
+        showNotification('تم مسح النموذج', 'success');
+    }
+
+    // ==================== حفظ ومعاينة ====================
+    function saveAndPreview() {
+        const activeForm = document.querySelector('.form-container.active');
+        if (!activeForm) return;
+        
+        const formId = activeForm.id;
+        let reportData, previewHtml, reportTitle;
+        
+        if (formId === 'form1') {
+            reportData = collectForm1Data();
+            previewHtml = generateForm1Preview(reportData);
+            reportTitle = `تقرير_${reportData.reportNum || 'بدون'}`;
+        } else {
+            reportData = collectForm2Data();
+            previewHtml = generateForm2Preview(reportData);
+            reportTitle = `مصائد_${reportData.month || 'بدون'}`;
+        }
+        
+        // حفظ في التخزين
+        saveReport(reportData, formId);
+        
+        // عرض المعاينة
+        currentReportData = { html: previewHtml, title: reportTitle };
+        showPreviewWindow(previewHtml);
+        
+        showNotification('تم حفظ التقرير', 'success');
+    }
+
+    // ==================== جمع بيانات النموذج الأول ====================
+    function collectForm1Data() {
+        return {
+            reportNum: document.getElementById('reportNum1').value,
+            reportDate: document.getElementById('reportDate1').value,
+            reportType: document.getElementById('reportTypeText').value,
+            month: document.getElementById('monthText').value,
+            rainfall: document.getElementById('rainfall').value,
+            tempMin: document.getElementById('tempMin').value,
+            tempMax: document.getElementById('tempMax').value,
+            humidity: document.getElementById('avgHumidity').value,
+            anomalies: {
+                highTemp: document.getElementById('highTemp').checked,
+                highTempText: document.getElementById('highTempText').value,
+                severeCold: document.getElementById('severeCold').checked,
+                severeColdText: document.getElementById('severeColdText').value,
+                frost: document.getElementById('frost').checked,
+                frostText: document.getElementById('frostText').value
+            },
+            olive: document.getElementById('olive').value,
+            vine: document.getElementById('vine').value,
+            wheat: document.getElementById('wheat').value,
+            vegetables: document.getElementById('vegetablesText').value,
+            extension: document.getElementById('extensionActivities').value,
+            control: document.getElementById('controlMeasures').value,
+            notes: document.getElementById('notes').value,
+            technician: document.getElementById('technician1').value,
+            unitHead: document.getElementById('unitHead1').value,
+            fruitPests: Array.from(document.querySelectorAll('.fruit-pest')).map(i => i.value),
+            fieldPests: Array.from(document.querySelectorAll('.field-pest')).map(i => i.value),
+            vegPests: Array.from(document.querySelectorAll('.veg-pest')).map(i => i.value)
+        };
+    }
+
+    // ==================== جمع بيانات النموذج الثاني ====================
     function collectForm2Data() {
         const traps = [];
-        const rows = document.querySelectorAll('#trapsTableBody tr');
-        
-        rows.forEach(row => {
+        document.querySelectorAll('#trapsTableBody tr').forEach(row => {
             const inputs = row.querySelectorAll('input');
             traps.push({
-                insectName: inputs[0]?.value || '',
-                readingDate: inputs[1]?.value || '',
-                trap1: inputs[2]?.value || '',
-                trap2: inputs[3]?.value || '',
-                trap3: inputs[4]?.value || '',
-                trap4: inputs[5]?.value || ''
+                insect: inputs[0]?.value || '',
+                date: inputs[1]?.value || '',
+                t1: inputs[2]?.value || '',
+                t2: inputs[3]?.value || '',
+                t3: inputs[4]?.value || '',
+                t4: inputs[5]?.value || ''
             });
         });
         
         return {
-            reportNum: document.getElementById('reportNum2')?.value || '',
-            reportDate: document.getElementById('reportDate2')?.value || '',
-            month: document.getElementById('monthTrapsText')?.value || '',
-            technician: document.getElementById('technician2')?.value || '',
-            unitHead: document.getElementById('unitHead2')?.value || '',
+            reportNum: document.getElementById('reportNum2').value,
+            reportDate: document.getElementById('reportDate2').value,
+            month: document.getElementById('monthTrapsText').value,
+            technician: document.getElementById('technician2').value,
+            unitHead: document.getElementById('unitHead2').value,
             traps: traps
         };
     }
-    
-    // تحسين دالة جمع بيانات النموذج 1
-    function collectForm1Data() {
-        return {
-            reportNum: document.getElementById('reportNum1')?.value || '',
-            reportDate: document.getElementById('reportDate1')?.value || '',
-            reportTypeText: document.getElementById('reportTypeText')?.value || '',
-            monthText: document.getElementById('monthText')?.value || '',
-            rainfall: document.getElementById('rainfall')?.value || '',
-            tempMin: document.getElementById('tempMin')?.value || '',
-            tempMax: document.getElementById('tempMax')?.value || '',
-            avgHumidity: document.getElementById('avgHumidity')?.value || '',
-            weatherAnomalies: {
-                highTemp: document.getElementById('highTemp')?.checked || false,
-                highTempText: document.getElementById('highTempText')?.value || '',
-                severeCold: document.getElementById('severeCold')?.checked || false,
-                severeColdText: document.getElementById('severeColdText')?.value || '',
-                frost: document.getElementById('frost')?.checked || false,
-                frostText: document.getElementById('frostText')?.value || ''
-            },
-            oliveStatus: document.getElementById('olive')?.value || '',
-            vineStatus: document.getElementById('vine')?.value || '',
-            wheatStatus: document.getElementById('wheat')?.value || '',
-            vegetablesText: document.getElementById('vegetablesText')?.value || '',
-            extensionActivities: document.getElementById('extensionActivities')?.value || '',
-            controlMeasures: document.getElementById('controlMeasures')?.value || '',
-            notes: document.getElementById('notes')?.value || '',
-            technician: document.getElementById('technician1')?.value || '',
-            unitHead: document.getElementById('unitHead1')?.value || '',
-            fruitPests: Array.from(document.querySelectorAll('#fruitPestsBody input')).map(i => i.value),
-            fieldPests: Array.from(document.querySelectorAll('#fieldPestsBody input')).map(i => i.value),
-            vegetablePests: Array.from(document.querySelectorAll('#vegetablePestsBody input')).map(i => i.value)
+
+    // ==================== توليد معاينة النموذج الأول ====================
+    function generateForm1Preview(data) {
+        const formatDate = (date) => {
+            if (!date) return 'غير محدد';
+            return new Date(date).toLocaleDateString('ar-EG');
         };
+
+        const pestsToHtml = (pests) => {
+            const valid = pests.filter(p => p && p.trim());
+            if (!valid.length) return '<tr><td style="text-align: center;">لا توجد آفات</td></tr>';
+            return valid.map(p => `<tr><td>${p}</td></tr>`).join('');
+        };
+
+        return `
+            <div class="preview-header">
+                <h1>تقرير الوقاية - النصف ${data.reportType} - شهر ${data.month}</h1>
+                <p>وزارة الزراعة - دائرة الوقاية</p>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">معلومات التقرير</h3>
+                <p><strong>رقم التقرير:</strong> ${data.reportNum || '______'}</p>
+                <p><strong>التاريخ:</strong> ${formatDate(data.reportDate)}</p>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">البيانات الجوية</h3>
+                <p><strong>الأمطار:</strong> ${data.rainfall || '0'} ملم</p>
+                <p><strong>الحرارة:</strong> ${data.tempMin || '0'} - ${data.tempMax || '0'} °C</p>
+                <p><strong>الرطوبة:</strong> ${data.humidity || '0'}%</p>
+                ${data.anomalies.highTemp ? `<p><strong>حرارة مرتفعة:</strong> ${data.anomalies.highTempText}</p>` : ''}
+                ${data.anomalies.severeCold ? `<p><strong>برد شديد:</strong> ${data.anomalies.severeColdText}</p>` : ''}
+                ${data.anomalies.frost ? `<p><strong>صقيع:</strong> ${data.anomalies.frostText}</p>` : ''}
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">الحالة العامة</h3>
+                <p><strong>زيتون:</strong> ${data.olive || '______'}</p>
+                <p><strong>كرمة:</strong> ${data.vine || '______'}</p>
+                <p><strong>قمح:</strong> ${data.wheat || '______'}</p>
+                <p><strong>الخضار:</strong> ${data.vegetables || '______'}</p>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">الآفات المسجلة</h3>
+                <h4 style="margin: 10px 0;">الأشجار المثمرة</h4>
+                <table class="preview-table">
+                    <thead><tr><th>اسم الآفة</th></tr></thead>
+                    <tbody>${pestsToHtml(data.fruitPests)}</tbody>
+                </table>
+                
+                <h4 style="margin: 20px 0 10px;">المحاصيل الحقلية</h4>
+                <table class="preview-table">
+                    <thead><tr><th>اسم الآفة</th></tr></thead>
+                    <tbody>${pestsToHtml(data.fieldPests)}</tbody>
+                </table>
+                
+                <h4 style="margin: 20px 0 10px;">الخضار</h4>
+                <table class="preview-table">
+                    <thead><tr><th>اسم الآفة</th></tr></thead>
+                    <tbody>${pestsToHtml(data.vegPests)}</tbody>
+                </table>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">النشاطات والإجراءات</h3>
+                <p><strong>الدعم الإرشادي:</strong> ${data.extension || '______'}</p>
+                <p><strong>إجراءات المكافحة:</strong> ${data.control || '______'}</p>
+                <p><strong>ملاحظات:</strong> ${data.notes || '______'}</p>
+            </div>
+            
+            <div class="signatures">
+                <div class="signature">
+                    <h4>فني الوقاية</h4>
+                    <p>${data.technician || '______________'}</p>
+                </div>
+                <div class="signature">
+                    <h4>رئيس الوحدة</h4>
+                    <p>${data.unitHead || '______________'}</p>
+                </div>
+            </div>
+        `;
     }
-    
-    // دالة إظهار التقارير المحفوظة
-    function loadAndDisplayReports() {
-        const filesList = document.getElementById('filesList');
-        if (!filesList) return;
+
+    // ==================== توليد معاينة النموذج الثاني ====================
+    function generateForm2Preview(data) {
+        let trapsHtml = '';
+        data.traps.forEach(t => {
+            if (t.insect || t.t1 || t.t2 || t.t3 || t.t4) {
+                trapsHtml += `
+                    <tr>
+                        <td>${t.insect || ''}</td>
+                        <td>${t.date || ''}</td>
+                        <td>${t.t1 || '0'}</td>
+                        <td>${t.t2 || '0'}</td>
+                        <td>${t.t3 || '0'}</td>
+                        <td>${t.t4 || '0'}</td>
+                    </tr>
+                `;
+            }
+        });
         
+        if (!trapsHtml) {
+            trapsHtml = '<tr><td colspan="6" style="text-align: center;">لا توجد بيانات</td></tr>';
+        }
+
+        return `
+            <div class="preview-header">
+                <h1>تقرير قراءة المصائد - شهر ${data.month}</h1>
+                <p>متابعة الحشرات والآفات</p>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">معلومات التقرير</h3>
+                <p><strong>رقم التقرير:</strong> ${data.reportNum || '______'}</p>
+                <p><strong>التاريخ:</strong> ${data.reportDate || '______'}</p>
+            </div>
+            
+            <div class="preview-section">
+                <h3 class="section-title">نتائج القراءة</h3>
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>اسم الحشرة</th>
+                            <th>تاريخ القراءة</th>
+                            <th>م1</th>
+                            <th>م2</th>
+                            <th>م3</th>
+                            <th>م4</th>
+                        </tr>
+                    </thead>
+                    <tbody>${trapsHtml}</tbody>
+                </table>
+            </div>
+            
+            <div class="signatures">
+                <div class="signature">
+                    <h4>فني الوقاية</h4>
+                    <p>${data.technician || '______________'}</p>
+                </div>
+                <div class="signature">
+                    <h4>رئيس الوحدة</h4>
+                    <p>${data.unitHead || '______________'}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // ==================== نافذة المعاينة ====================
+    function showPreviewWindow(html) {
+        // حذف النافذة السابقة إن وجدت
+        if (currentPreviewWindow) {
+            currentPreviewWindow.remove();
+        }
+        
+        const previewWindow = document.createElement('div');
+        previewWindow.className = 'preview-window';
+        previewWindow.innerHTML = `
+            <div class="preview-controls">
+                <button class="preview-btn pdf-btn" onclick="downloadPDF()"><i class="fas fa-download"></i> PDF</button>
+                <button class="preview-btn print-btn" onclick="printReport()"><i class="fas fa-print"></i> طباعة</button>
+                <button class="preview-btn close-preview-btn" onclick="closePreview()"><i class="fas fa-times"></i> إغلاق</button>
+            </div>
+            <div class="preview-content" id="previewContent">${html}</div>
+        `;
+        
+        document.body.appendChild(previewWindow);
+        currentPreviewWindow = previewWindow;
+    }
+
+    // ==================== تنزيل PDF ====================
+    window.downloadPDF = function() {
+        if (!currentReportData) return;
+        
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        
+        const element = document.getElementById('previewContent');
+        const opt = {
+            margin: [15, 15, 15, 15],
+            filename: `${currentReportData.title}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        html2pdf().set(opt).from(element).save()
+            .then(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showNotification('تم تنزيل PDF', 'success');
+            })
+            .catch(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showNotification('حدث خطأ', 'error');
+            });
+    };
+
+    // ==================== طباعة ====================
+    window.printReport = function() {
+        if (!currentReportData) return;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head><title>${currentReportData.title}</title></head>
+            <body>${currentReportData.html}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
+    // ==================== إغلاق المعاينة ====================
+    window.closePreview = function() {
+        if (currentPreviewWindow) {
+            currentPreviewWindow.remove();
+            currentPreviewWindow = null;
+            currentReportData = null;
+        }
+    };
+
+    // ==================== حفظ التقرير ====================
+    function saveReport(data, type) {
+        const reports = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const reportName = type === 'form1' 
+            ? `تقرير ${data.reportNum || ''} - ${data.month || ''}`
+            : `مصائد ${data.month || ''}`;
+        
+        reports.push({
+            id: Date.now(),
+            name: reportName,
+            type: type,
+            date: new Date().toISOString(),
+            data: data
+        });
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+    }
+
+    // ==================== تحميل البيانات المحفوظة ====================
+    function loadSavedData() {
+        const form1Data = localStorage.getItem('current_form1');
+        if (form1Data) {
+            const data = JSON.parse(form1Data);
+            // يمكن إضافة تحميل البيانات هنا إذا أردت
+        }
+    }
+
+    // ==================== لوحة التقارير ====================
+    function showFilesPanel() {
+        switchTab('');
+        document.getElementById('filesPanel').classList.add('active');
+        loadFilesList();
+    }
+
+    function closeFilesPanel() {
+        document.getElementById('filesPanel').classList.remove('active');
+        document.querySelector('[data-tab="form1"]').classList.add('active');
+        document.getElementById('form1').classList.add('active');
+    }
+
+    function loadFilesList() {
+        const filesList = document.getElementById('filesList');
         const reports = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         
         if (reports.length === 0) {
-            filesList.innerHTML = `<div class="empty-files">${currentLang === 'ar' ? '📭 لا توجد تقارير محفوظة' : '📭 No saved reports'}</div>`;
+            filesList.innerHTML = '<div style="text-align: center; padding: 40px;">لا توجد تقارير محفوظة</div>';
             return;
         }
         
@@ -2074,176 +1470,74 @@
         filesList.innerHTML = '';
         
         reports.forEach((report, index) => {
-            const date = new Date(report.date).toLocaleDateString(
-                currentLang === 'ar' ? 'ar-EG' : 'en-US',
-                { year: 'numeric', month: 'short', day: 'numeric' }
-            );
+            const date = new Date(report.date).toLocaleDateString('ar-EG');
+            const icon = report.type === 'form1' ? 'fa-file-alt' : 'fa-bug';
             
             const item = document.createElement('div');
             item.className = 'file-item';
             item.innerHTML = `
                 <div class="file-info">
-                    <i class="fas ${report.type === 'form1' ? 'fa-file-alt' : 'fa-bug'} file-icon"></i>
+                    <i class="fas ${icon} file-icon"></i>
                     <div>
-                        <div class="file-name">${report.name}</div>
-                        <div class="file-date">${date}</div>
+                        <div style="font-weight: bold;">${report.name}</div>
+                        <div style="color: #777; font-size: 13px;">${date}</div>
                     </div>
                 </div>
-                <div class="file-actions">
-                    <button class="download-btn" onclick="previewReport(${index})">
-                        <i class="fas fa-eye"></i> ${currentLang === 'ar' ? 'عرض' : 'View'}
-                    </button>
-                    <button class="delete-btn" onclick="deleteReport(${index})">
-                        <i class="fas fa-trash"></i> ${currentLang === 'ar' ? 'حذف' : 'Delete'}
-                    </button>
+                <div>
+                    <button onclick="previewReport(${index})" style="background: #3a7bd5; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-left: 5px; cursor: pointer;"><i class="fas fa-eye"></i></button>
+                    <button onclick="deleteReport(${index})" style="background: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash"></i></button>
                 </div>
             `;
             filesList.appendChild(item);
         });
     }
-    
-    // دوال مساعدة
+
+    // ==================== معاينة تقرير محفوظ ====================
     window.previewReport = function(index) {
         const reports = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         const report = reports[index];
         if (!report) return;
         
         const html = report.type === 'form1' 
-            ? generateForm1PreviewHtml(report.data)
-            : generateForm2PreviewHtml(report.data);
+            ? generateForm1Preview(report.data)
+            : generateForm2Preview(report.data);
         
-        window.currentReportData = {
-            html: html,
-            title: report.name,
-            data: report.data,
-            type: report.type
-        };
-        
-        showPreviewWindow(html, report.name);
+        currentReportData = { html: html, title: report.name };
+        showPreviewWindow(html);
     };
-    
+
+    // ==================== حذف تقرير ====================
     window.deleteReport = function(index) {
-        if (!confirm(currentLang === 'ar' ? 'تأكيد الحذف؟' : 'Confirm delete?')) return;
+        if (!confirm('تأكيد الحذف؟')) return;
         
         const reports = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         reports.splice(index, 1);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
-        loadAndDisplayReports();
-        showNotification(
-            currentLang === 'ar' ? 'تم الحذف' : 'Deleted', 
-            'success'
-        );
+        loadFilesList();
+        showNotification('تم الحذف', 'success');
     };
-    
-    // تحديث دوال إظهار وإخفاء العناصر حسب اللغة
-    function applyLanguage(lang) {
-        const arElements = document.querySelectorAll('[class*="-ar"]:not(input):not(select):not(textarea)');
-        const enElements = document.querySelectorAll('[class*="-en"]:not(input):not(select):not(textarea)');
+
+    // ==================== نافذة التعليمات ====================
+    function showInstructions() {
+        document.getElementById('instructionsModal').style.display = 'flex';
+    }
+
+    window.closeInstructions = function() {
+        document.getElementById('instructionsModal').style.display = 'none';
+    };
+
+    // ==================== الإشعارات ====================
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.background = type === 'error' ? '#d9534f' : '#2d5e2d';
+        notification.style.display = 'block';
         
-        arElements.forEach(el => el.style.display = lang === 'ar' ? '' : 'none');
-        enElements.forEach(el => el.style.display = lang === 'en' ? '' : 'none');
-        
-        // تحديث placeholders
-        document.querySelectorAll('.pest-name').forEach(input => {
-            input.placeholder = lang === 'ar' ? 'اسم الآفة' : 'Pest name';
-        });
-        
-        document.querySelectorAll('.insect-name').forEach(input => {
-            input.placeholder = lang === 'ar' ? 'اسم الحشرة' : 'Insect name';
-        });
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
     }
 </script>
 
-<!-- إضافة أنماط إضافية للإشعارات -->
-<style>
-    .notification {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        padding: 15px 25px;
-        background-color: var(--accent-color);
-        color: white;
-        border-radius: 50px;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        display: none;
-        z-index: 10000;
-        font-weight: 600;
-        animation: slideIn 0.5s ease;
-    }
-    
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    /* تحسينات للأجهزة المحمولة */
-    @media (max-width: 768px) {
-        .preview-controls {
-            flex-direction: column;
-            width: 90%;
-            left: 5%;
-            transform: none;
-            border-radius: 20px;
-            padding: 10px;
-        }
-        
-        .preview-btn {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .form-title-with-input {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .form-title-input {
-            width: 100%;
-        }
-        
-        .weather-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<!-- تهيئة نهائية -->
-<script>
-    // تهيئة التطبيق بعد تحميل كل العناصر
-    document.addEventListener('DOMContentLoaded', function() {
-        // إنشاء صفوف جدول المصائد
-        createTrapTableRows();
-        
-        // تحميل التقارير المحفوظة عند فتح اللوحة
-        document.getElementById('filesBtn').addEventListener('click', function() {
-            setTimeout(loadAndDisplayReports, 100);
-        });
-        
-        // إعداد حقول الشذوذ الجوي
-        const checkboxes = ['highTemp', 'severeCold', 'frost'];
-        checkboxes.forEach(id => {
-            const checkbox = document.getElementById(id);
-            if (checkbox) {
-                checkbox.addEventListener('change', function() {
-                    const textId = id + 'Text';
-                    const textField = document.getElementById(textId);
-                    if (textField) {
-                        textField.disabled = !this.checked;
-                        if (!this.checked) textField.value = '';
-                    }
-                });
-            }
-        });
-        
-        // تعطيل حقول الشذوذ في البداية
-        ['highTempText', 'severeColdText', 'frostText'].forEach(id => {
-            const field = document.getElementById(id);
-            if (field) field.disabled = true;
-        });
-    });
-</script>
+</body>
+</html>
