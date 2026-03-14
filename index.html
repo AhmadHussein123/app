@@ -1,22 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>تقرير</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تطبيق تعبئة تقرير الوقاية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f8f0; color: #333; line-height: 1.6; padding: 20px; }
@@ -30,10 +19,10 @@
         .tab-btn:hover { background-color: #e9f5e9; }
         .tab-btn.active { background-color: #2d5e2d; color: white; }
         .action-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
-        .export-btn, .files-btn, .export-pdf-btn { background-color: #3a7bd5; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
-        .export-pdf-btn { background-color: #d9534f; }
-        .export-btn:hover, .files-btn:hover, .export-pdf-btn:hover { background-color: #2a5bb5; transform: translateY(-2px); }
-        .export-pdf-btn:hover { background-color: #c9302c; }
+        .export-btn, .files-btn { background-color: #3a7bd5; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .export-btn { background-color: #d9534f; }
+        .export-btn:hover, .files-btn:hover { background-color: #2a5bb5; transform: translateY(-2px); }
+        .export-btn:hover { background-color: #c9302c; }
         .clear-btn { background-color: #f0ad4e; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
         .clear-btn:hover { background-color: #ec971f; }
         .form-container { display: none; background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
@@ -98,8 +87,128 @@
         .temp-range-input { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
         .temp-range-input input { width: 120px; text-align: center; }
         
-        /* نافذة PDF */
-        .pdf-window {
+        /* نافذة التعليمات */
+        .instructions-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .instructions-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .instructions-modal h2 {
+            color: #2d5e2d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .instructions-modal ol {
+            margin-right: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions-modal ul {
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+        
+        .instructions-modal li {
+            margin-bottom: 8px;
+        }
+        
+        .close-instructions-btn {
+            padding: 10px 20px;
+            background: #2d5e2d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        /* زر المساعدة */
+        .help-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #3a7bd5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .help-btn:hover {
+            background-color: #2a5bb5;
+            transform: scale(1.1);
+        }
+        
+        /* رسالة معلومات */
+        .info-message {
+            text-align: center;
+            margin: 15px 0;
+            padding: 12px;
+            background: linear-gradient(135deg, #f0f8f0 0%, #e9f5e9 100%);
+            border-radius: 8px;
+            border: 2px solid #2d5e2d;
+            color: #2d5e2d;
+            font-weight: 600;
+        }
+        
+        .info-message i {
+            color: #d9534f;
+            margin-left: 8px;
+        }
+        
+        /* زر حفظ جديد */
+        .save-btn {
+            background-color: #2d5e2d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .save-btn:hover {
+            background-color: #1e4d1e;
+            transform: translateY(-2px);
+        }
+        
+        /* نافذة المعاينة */
+        .preview-window {
             position: fixed;
             top: 0;
             left: 0;
@@ -112,7 +221,7 @@
             direction: rtl;
         }
         
-        .pdf-content {
+        .preview-content {
             max-width: 210mm;
             margin: 0 auto;
             padding: 20mm;
@@ -120,25 +229,25 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         
-        .pdf-header {
+        .preview-header {
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 3px solid #2d5e2d;
         }
         
-        .pdf-header h1 {
+        .preview-header h1 {
             color: #2d5e2d;
             margin-bottom: 10px;
             font-size: 28px;
         }
         
-        .pdf-header p {
+        .preview-header p {
             color: #4a7c4a;
             font-size: 18px;
         }
         
-        .pdf-section {
+        .preview-section {
             margin-bottom: 25px;
             padding: 20px;
             border-right: 4px solid #2d5e2d;
@@ -146,7 +255,7 @@
             border-radius: 8px;
         }
         
-        .pdf-section-title {
+        .preview-section-title {
             color: #2d5e2d;
             font-size: 20px;
             margin-bottom: 15px;
@@ -154,13 +263,13 @@
             border-bottom: 1px solid #ddd;
         }
         
-        .pdf-table {
+        .preview-table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
         }
         
-        .pdf-table th {
+        .preview-table th {
             background-color: #2d5e2d;
             color: white;
             padding: 10px;
@@ -168,17 +277,17 @@
             font-weight: bold;
         }
         
-        .pdf-table td {
+        .preview-table td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: right;
         }
         
-        .pdf-table tr:nth-child(even) {
+        .preview-table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
         
-        .pdf-signatures {
+        .preview-signatures {
             display: flex;
             justify-content: space-between;
             margin-top: 50px;
@@ -186,19 +295,19 @@
             border-top: 2px solid #ddd;
         }
         
-        .pdf-signature {
+        .preview-signature {
             text-align: center;
             width: 45%;
         }
         
-        .pdf-signature h4 {
+        .preview-signature h4 {
             margin-bottom: 15px;
             color: #2d5e2d;
             font-size: 18px;
             font-weight: bold;
         }
         
-        .pdf-textarea-content {
+        .preview-textarea-content {
             white-space: pre-line;
             line-height: 1.8;
             padding: 10px;
@@ -207,32 +316,98 @@
             border: 1px solid #ddd;
         }
         
-        .pdf-close-btn {
+        /* أزرار التحكم في المعاينة */
+        .preview-controls {
             position: fixed;
             top: 20px;
             left: 20px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             z-index: 10000;
+            display: flex;
+            gap: 10px;
         }
         
-        .pdf-print-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #3a7bd5;
-            color: white;
-            border: none;
+        .preview-btn {
             padding: 10px 20px;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            z-index: 10000;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .download-btn-preview {
+            background-color: #2d5e2d;
+            color: white;
+        }
+        
+        .download-btn-preview:hover {
+            background-color: #1e4d1e;
+        }
+        
+        .print-btn {
+            background-color: #3a7bd5;
+            color: white;
+        }
+        
+        .print-btn:hover {
+            background-color: #2a5bb5;
+        }
+        
+        .close-preview-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .close-preview-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .back-btn {
+            background-color: #f0ad4e;
+            color: white;
+        }
+        
+        /* نافذة التحميل */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 20000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2d5e2d;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -250,18 +425,20 @@
             .vegetables-textarea { min-height: 120px; }
             .temp-range-input { flex-direction: column; align-items: flex-start; }
             .temp-range-input input { width: 100%; }
-            .pdf-content { padding: 10mm; }
+            .instructions-content { margin: 10px; padding: 20px; }
+            .help-btn { bottom: 10px; left: 10px; width: 40px; height: 40px; }
+            .preview-controls { top: 10px; left: 10px; flex-direction: column; }
+            .preview-content { padding: 10mm; }
         }
         
-        /* إصلاح مشكلة الـ print على الموبايل */
         @media print {
             body * {
                 visibility: hidden;
             }
-            .pdf-window, .pdf-window * {
+            .preview-window, .preview-window * {
                 visibility: visible;
             }
-            .pdf-window {
+            .preview-window {
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -270,7 +447,7 @@
                 padding: 0;
                 margin: 0;
             }
-            .pdf-close-btn, .pdf-print-btn {
+            .preview-controls {
                 display: none !important;
             }
         }
@@ -279,9 +456,17 @@
 <body>
     <div class="container">
         <header>
-            <h1>تقرير الوقاية</h1>
+            <h1>تطبيق تقارير الوقاية</h1>
             <p class="subtitle">الى دائرة زراعة قطنا - الوقاية</p>
         </header>
+        
+        <!-- رسالة توضيحية -->
+        <div class="info-message">
+            <i class="fas fa-info-circle"></i>
+            استخدم زر <strong>"حفظ ومعاينة التقرير"</strong> لعرض التقرير ثم:
+            <br>
+            <strong>"تنزيل PDF"</strong> لتنزيل ملف PDF أو <strong>"طباعة"</strong> للطباعة مباشرة
+        </div>
         
         <div class="main-controls">
             <div class="tabs-container">
@@ -294,13 +479,11 @@
                     <i class="fas fa-eraser"></i> مسح النموذج
                 </button>
                 <button class="files-btn" id="filesBtn">
-                    <i class="fas fa-folder-open"></i> الملفات المحفوظة
+                    <i class="fas fa-folder-open"></i> التقارير المحفوظة
                 </button>
-                <button class="export-pdf-btn" id="exportPdfBtn">
-                    <i class="fas fa-file-pdf"></i> تصدير PDF
-                </button>
-                <button class="export-btn" id="exportBtn">
-                    <i class="fas fa-file-export"></i> تصدير Excel
+                <!-- زر الحفظ الرئيسي -->
+                <button class="save-btn" id="saveBtn">
+                    <i class="fas fa-save"></i> حفظ ومعاينة التقرير
                 </button>
             </div>
         </div>
@@ -578,29 +761,77 @@
             </div>
         </div>
         
-        <!-- لوحة الملفات المحفوظة -->
+        <!-- لوحة التقارير المحفوظة -->
         <div id="filesPanel" class="files-panel">
             <div class="files-header">
-                <h2 class="files-title">الملفات المحفوظة</h2>
+                <h2 class="files-title">التقارير المحفوظة</h2>
                 <button class="close-files-btn" id="closeFilesBtn">
                     <i class="fas fa-times"></i> إغلاق
                 </button>
             </div>
             
             <div class="files-list" id="filesList">
-                <!-- الملفات ستظهر هنا -->
+                <!-- التقارير ستظهر هنا -->
             </div>
         </div>
         
         <!-- إشعار -->
         <div id="notification" class="notification"></div>
     </div>
+    
+    <!-- نافذة التعليمات -->
+    <div id="instructionsModal" class="instructions-modal">
+        <div class="instructions-content">
+            <h2>كيفية حفظ وتنزيل التقرير</h2>
+            <div style="text-align: right;">
+                <p><strong>خطوات حفظ وتنزيل التقرير:</strong></p>
+                <ol>
+                    <li>املأ جميع بيانات التقرير</li>
+                    <li>اضغط على زر <strong>"حفظ ومعاينة التقرير"</strong></li>
+                    <li>ستظهر نافذة تحتوي على التقرير</li>
+                    <li>لتنزيل التقرير كملف PDF:
+                        <ul>
+                            <li>اضغط على زر <strong>"تنزيل PDF"</strong></li>
+                            <li>انتظر حتى يتم إنشاء الملف</li>
+                            <li>سيتم تنزيل الملف تلقائياً</li>
+                        </ul>
+                    </li>
+                    <li>لطباعة التقرير:
+                        <ul>
+                            <li>اضغط على زر <strong>"طباعة"</strong></li>
+                            <li>اختر الطابعة</li>
+                            <li>اضغط <strong>"طباعة"</strong></li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <div style="background-color: #f0f8f0; padding: 15px; border-radius: 5px; margin-top: 15px; border-right: 3px solid #2d5e2d;">
+                    <p><i class="fas fa-info-circle" style="color: #2d5e2d;"></i> 
+                    <strong>ملاحظة هامة:</strong> عند الضغط على زر "تنزيل PDF" قد يستغرق إنشاء الملف بضع ثوانٍ</p>
+                </div>
+                
+                <button onclick="closeInstructions()" class="close-instructions-btn">
+                    <i class="fas fa-check"></i> فهمت، شكراً
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- زر المساعدة -->
+    <button class="help-btn" id="helpBtn">
+        <i class="fas fa-question-circle"></i>
+    </button>
+    
+    <!-- نافذة التحميل -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>جاري إنشاء ملف PDF...</p>
+    </div>
 
     <script>
         // ==================== إدارة التطبيق ====================
-        const STORAGE_KEYS = {
-            FILES: 'prevention_reports_files'
-        };
+        const STORAGE_KEY = 'prevention_reports';
+        let isFirstSave = true;
         
         // بدء التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -615,11 +846,11 @@
             createTrapTableRows();
             
             // إضافة أحداث الأزرار
-            document.getElementById('exportPdfBtn').addEventListener('click', exportToPdf);
-            document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+            document.getElementById('saveBtn').addEventListener('click', saveAndPreviewReport);
             document.getElementById('clearBtn').addEventListener('click', clearForm);
             document.getElementById('filesBtn').addEventListener('click', showFilesPanel);
             document.getElementById('closeFilesBtn').addEventListener('click', closeFilesPanel);
+            document.getElementById('helpBtn').addEventListener('click', showInstructions);
             
             // أحداث التبويبات
             document.querySelectorAll('.tab-btn').forEach(button => {
@@ -628,21 +859,11 @@
                 });
             });
             
-            // إضافة حدث لحقول الشذوذ الجوي
-            document.getElementById('highTemp').addEventListener('change', function() {
-                document.getElementById('highTempText').disabled = !this.checked;
-            });
-            document.getElementById('severeCold').addEventListener('change', function() {
-                document.getElementById('severeColdText').disabled = !this.checked;
-            });
-            document.getElementById('frost').addEventListener('change', function() {
-                document.getElementById('frostText').disabled = !this.checked;
-            });
+            // أحداث حقل الشذوذ الجوي
+            setupWeatherAnomalies();
             
-            // تعطيل الحقول في البداية
-            document.getElementById('highTempText').disabled = true;
-            document.getElementById('severeColdText').disabled = true;
-            document.getElementById('frostText').disabled = true;
+            // تحميل أي بيانات محفوظة
+            loadSavedData();
         }
         
         function createTrapTableRows() {
@@ -663,6 +884,41 @@
             }
         }
         
+        function setupWeatherAnomalies() {
+            const highTempCheckbox = document.getElementById('highTemp');
+            const severeColdCheckbox = document.getElementById('severeCold');
+            const frostCheckbox = document.getElementById('frost');
+            
+            highTempCheckbox.addEventListener('change', function() {
+                document.getElementById('highTempText').disabled = !this.checked;
+                if (!this.checked) document.getElementById('highTempText').value = '';
+            });
+            
+            severeColdCheckbox.addEventListener('change', function() {
+                document.getElementById('severeColdText').disabled = !this.checked;
+                if (!this.checked) document.getElementById('severeColdText').value = '';
+            });
+            
+            frostCheckbox.addEventListener('change', function() {
+                document.getElementById('frostText').disabled = !this.checked;
+                if (!this.checked) document.getElementById('frostText').value = '';
+            });
+            
+            // تعطيل الحقول في البداية
+            document.getElementById('highTempText').disabled = true;
+            document.getElementById('severeColdText').disabled = true;
+            document.getElementById('frostText').disabled = true;
+        }
+        
+        // ==================== نافذة التعليمات ====================
+        function showInstructions() {
+            document.getElementById('instructionsModal').style.display = 'flex';
+        }
+        
+        function closeInstructions() {
+            document.getElementById('instructionsModal').style.display = 'none';
+        }
+        
         // ==================== التحكم بالتبويبات ====================
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -679,7 +935,7 @@
             document.getElementById(tabId).classList.add('active');
         }
         
-        // ==================== زر الملفات المحفوظة ====================
+        // ==================== زر التقارير المحفوظة ====================
         function showFilesPanel() {
             document.querySelectorAll('.form-container').forEach(form => {
                 form.classList.remove('active');
@@ -690,7 +946,7 @@
             });
             
             document.getElementById('filesPanel').classList.add('active');
-            loadAndDisplayFiles();
+            loadAndDisplayReports();
         }
         
         function closeFilesPanel() {
@@ -756,6 +1012,9 @@
             document.getElementById('highTempText').disabled = true;
             document.getElementById('severeColdText').disabled = true;
             document.getElementById('frostText').disabled = true;
+            
+            // حفظ حالة المسح
+            saveCurrentFormData();
         }
         
         function clearForm2() {
@@ -778,71 +1037,625 @@
             document.querySelectorAll('#trapsTable input').forEach(input => {
                 input.value = '';
             });
-        }
-        
-        // ==================== زر التصدير Excel ====================
-        function exportToExcel() {
-            const activeForm = document.querySelector('.form-container.active');
-            const formId = activeForm.id;
             
-            if (formId === 'form1') {
-                exportForm1ToExcel();
-            } else if (formId === 'form2') {
-                exportForm2ToExcel();
-            }
+            // حفظ حالة المسح
+            saveCurrentFormData();
         }
         
-        function exportForm1ToExcel() {
+        // ==================== حفظ ومعاينة التقرير ====================
+        function saveAndPreviewReport() {
             try {
-                const reportData = collectForm1Data();
-                const wb = XLSX.utils.book_new();
-                const wsData = createForm1Sheet(reportData);
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                XLSX.utils.book_append_sheet(wb, ws, 'تقرير نصفي');
+                const activeForm = document.querySelector('.form-container.active');
+                const formId = activeForm.id;
                 
-                const reportNum = document.getElementById('reportNum1').value || 'بدون_رقم';
-                const reportType = document.getElementById('reportTypeText').value || '';
-                const month = document.getElementById('monthText').value || '';
-                const fileName = `تقرير_الوقاية_${reportType}_${month}_${reportNum}.xlsx`;
+                if (!formId) {
+                    showNotification('لم يتم العثور على النموذج النشط', 'error');
+                    return;
+                }
                 
-                // حفظ الملف في التخزين المحلي
-                saveExcelFileToStorage(fileName, 'form1', reportData);
+                // حفظ البيانات أولاً
+                saveCurrentFormData();
                 
-                // تصدير الملف للتنزيل
-                XLSX.writeFile(wb, fileName);
+                // إنشاء HTML للمعاينة
+                let previewHtml = '';
+                let reportTitle = '';
+                let reportData = {};
                 
-                showNotification('تم تصدير التقرير النصفي وحفظه بنجاح', 'success');
+                if (formId === 'form1') {
+                    reportData = collectForm1Data();
+                    previewHtml = generateForm1PreviewHtml(reportData);
+                    const reportNum = document.getElementById('reportNum1').value || 'بدون_رقم';
+                    const reportTypeText = document.getElementById('reportTypeText').value || '';
+                    const monthText = document.getElementById('monthText').value || '';
+                    reportTitle = `تقرير الوقاية النصفي - ${reportTypeText} - ${monthText} - ${reportNum}`;
+                } else if (formId === 'form2') {
+                    reportData = collectForm2Data();
+                    previewHtml = generateForm2PreviewHtml(reportData);
+                    const reportNum = document.getElementById('reportNum2').value || 'بدون_رقم';
+                    const month = document.getElementById('monthTrapsText').value || 'بدون_شهر';
+                    reportTitle = `تقرير المصائد - ${month} - ${reportNum}`;
+                }
+                
+                // حفظ بيانات التقرير مؤقتاً للتنزيل
+                window.currentReportData = {
+                    html: previewHtml,
+                    title: reportTitle,
+                    data: reportData,
+                    type: formId
+                };
+                
+                // عرض نافذة المعاينة
+                showPreviewWindow(previewHtml, reportTitle);
+                
+                showNotification('تم حفظ التقرير وعرضه للمعاينة', 'success');
+                
             } catch (error) {
-                console.error('خطأ في تصدير Excel:', error);
-                showNotification('حدث خطأ في تصدير Excel', 'error');
+                console.error('خطأ في حفظ التقرير:', error);
+                showNotification('حدث خطأ في حفظ التقرير', 'error');
             }
         }
         
-        function exportForm2ToExcel() {
+        function showPreviewWindow(previewHtml, title) {
+            // إنشاء نافذة المعاينة
+            const previewWindow = document.createElement('div');
+            previewWindow.className = 'preview-window';
+            previewWindow.innerHTML = `
+                <div class="preview-controls">
+                    <button class="preview-btn download-btn-preview" onclick="downloadAsPDF()">
+                        <i class="fas fa-download"></i> تنزيل PDF
+                    </button>
+                    <button class="preview-btn print-btn" onclick="printReport()">
+                        <i class="fas fa-print"></i> طباعة
+                    </button>
+                    <button class="preview-btn close-preview-btn" onclick="closePreviewWindow()">
+                        <i class="fas fa-times"></i> إغلاق
+                    </button>
+                </div>
+                <div class="preview-content" id="previewContent">
+                    ${previewHtml}
+                </div>
+            `;
+            
+            document.body.appendChild(previewWindow);
+            
+            // حفظ المرجع للنافذة
+            window.currentPreviewWindow = previewWindow;
+        }
+        
+        // ==================== وظيفة التنزيل كـ PDF ====================
+        function downloadAsPDF() {
             try {
-                const reportData = collectForm2Data();
-                const wb = XLSX.utils.book_new();
-                const wsData = createForm2Sheet(reportData);
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                XLSX.utils.book_append_sheet(wb, ws, 'تقرير المصائد');
+                if (!window.currentReportData) {
+                    showNotification('لا توجد بيانات التقرير', 'error');
+                    return;
+                }
                 
-                const reportNum = document.getElementById('reportNum2').value || 'بدون_رقم';
-                const month = document.getElementById('monthTrapsText').value || 'بدون_شهر';
-                const fileName = `تقرير_المصائد_${month}_${reportNum}.xlsx`;
+                // عرض نافذة التحميل
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.display = 'flex';
                 
-                // حفظ الملف في التخزين المحلي
-                saveExcelFileToStorage(fileName, 'form2', reportData);
+                const element = document.getElementById('previewContent');
                 
-                // تصدير الملف للتنزيل
-                XLSX.writeFile(wb, fileName);
+                // خيارات PDF
+                const opt = {
+                    margin:       10,
+                    filename:     `${window.currentReportData.title}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true
+                    },
+                    jsPDF:        { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                };
                 
-                showNotification('تم تصدير تقرير المصائد وحفظه بنجاح', 'success');
+                // إنشاء PDF
+                html2pdf().set(opt).from(element).save().then(() => {
+                    // إخفاء نافذة التحميل
+                    loadingOverlay.style.display = 'none';
+                    showNotification('تم تنزيل ملف PDF بنجاح', 'success');
+                }).catch(error => {
+                    loadingOverlay.style.display = 'none';
+                    console.error('خطأ في إنشاء PDF:', error);
+                    showNotification('حدث خطأ في إنشاء PDF', 'error');
+                    
+                    // محاولة الطباعة كبديل
+                    if (confirm('حدث خطأ في إنشاء PDF. هل تريد الطباعة بدلاً من ذلك؟')) {
+                        printReport();
+                    }
+                });
+                
             } catch (error) {
-                console.error('خطأ في تصدير Excel:', error);
-                showNotification('حدث خطأ في تصدير Excel', 'error');
+                console.error('خطأ في تنزيل PDF:', error);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showNotification('حدث خطأ في تنزيل PDF', 'error');
             }
         }
         
+        // ==================== وظيفة الطباعة ====================
+        function printReport() {
+            try {
+                // إنشاء نافذة طباعة
+                const printWindow = window.open('', '_blank');
+                
+                // إنشاء محتوى الطباعة
+                let printContent = `
+                    <!DOCTYPE html>
+                    <html lang="ar" dir="rtl">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>${window.currentReportData.title}</title>
+                        <style>
+                            * {
+                                box-sizing: border-box;
+                                margin: 0;
+                                padding: 0;
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            }
+                            
+                            body {
+                                padding: 20mm;
+                                color: #333;
+                                line-height: 1.6;
+                                max-width: 210mm;
+                                margin: 0 auto;
+                            }
+                            
+                            .preview-header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                                padding-bottom: 20px;
+                                border-bottom: 3px solid #2d5e2d;
+                            }
+                            
+                            .preview-header h1 {
+                                color: #2d5e2d;
+                                margin-bottom: 10px;
+                                font-size: 28px;
+                            }
+                            
+                            .preview-header p {
+                                color: #4a7c4a;
+                                font-size: 18px;
+                            }
+                            
+                            .preview-section {
+                                margin-bottom: 25px;
+                                padding: 20px;
+                                border-right: 4px solid #2d5e2d;
+                                background-color: #f9fdf9;
+                                border-radius: 8px;
+                                page-break-inside: avoid;
+                            }
+                            
+                            .preview-section-title {
+                                color: #2d5e2d;
+                                font-size: 20px;
+                                margin-bottom: 15px;
+                                padding-bottom: 10px;
+                                border-bottom: 1px solid #ddd;
+                            }
+                            
+                            .preview-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 15px 0;
+                                page-break-inside: avoid;
+                            }
+                            
+                            .preview-table th {
+                                background-color: #2d5e2d;
+                                color: white;
+                                padding: 10px;
+                                text-align: right;
+                                font-weight: bold;
+                            }
+                            
+                            .preview-table td {
+                                padding: 10px;
+                                border: 1px solid #ddd;
+                                text-align: right;
+                            }
+                            
+                            .preview-table tr:nth-child(even) {
+                                background-color: #f9f9f9;
+                            }
+                            
+                            .preview-signatures {
+                                display: flex;
+                                justify-content: space-between;
+                                margin-top: 50px;
+                                padding-top: 30px;
+                                border-top: 2px solid #ddd;
+                                page-break-inside: avoid;
+                            }
+                            
+                            .preview-signature {
+                                text-align: center;
+                                width: 45%;
+                            }
+                            
+                            .preview-signature h4 {
+                                margin-bottom: 15px;
+                                color: #2d5e2d;
+                                font-size: 18px;
+                                font-weight: bold;
+                            }
+                            
+                            .preview-textarea-content {
+                                white-space: pre-line;
+                                line-height: 1.8;
+                                padding: 10px;
+                                background-color: #f9f9f9;
+                                border-radius: 5px;
+                                border: 1px solid #ddd;
+                            }
+                            
+                            @media print {
+                                body {
+                                    padding: 10mm;
+                                }
+                                
+                                .preview-section {
+                                    border: 1px solid #ddd;
+                                    page-break-inside: avoid;
+                                }
+                                
+                                h1, h2, h3, h4 {
+                                    page-break-after: avoid;
+                                }
+                                
+                                table {
+                                    page-break-inside: avoid;
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${window.currentReportData.html}
+                    </body>
+                    </html>
+                `;
+                
+                printWindow.document.write(printContent);
+                printWindow.document.close();
+                
+                // الانتظار حتى يتم تحميل المحتوى ثم الطباعة
+                printWindow.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                        // إغلاق النافذة بعد الطباعة
+                        printWindow.onafterprint = function() {
+                            printWindow.close();
+                        };
+                    }, 500);
+                };
+                
+            } catch (error) {
+                console.error('خطأ في الطباعة:', error);
+                showNotification('حدث خطأ في الطباعة', 'error');
+            }
+        }
+        
+        // ==================== إغلاق نافذة المعاينة ====================
+        function closePreviewWindow() {
+            if (window.currentPreviewWindow && window.currentPreviewWindow.parentNode) {
+                window.currentPreviewWindow.parentNode.removeChild(window.currentPreviewWindow);
+                window.currentPreviewWindow = null;
+                window.currentReportData = null;
+            }
+        }
+        
+        // ==================== توليد HTML للمعاينة ====================
+        function generateForm1PreviewHtml(data) {
+            // تنسيق التاريخ
+            function formatDate(dateStr) {
+                if (!dateStr) return 'غير محدد';
+                try {
+                    const date = new Date(dateStr);
+                    if (isNaN(date.getTime())) return dateStr;
+                    return date.toLocaleDateString('ar-EG', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                } catch (e) {
+                    return dateStr;
+                }
+            }
+            
+            // إنشاء قائمة الآفات
+            function createPestsHtml(pestsArray) {
+                const validPests = pestsArray.filter(pest => pest && pest.trim() !== '');
+                if (validPests.length === 0) {
+                    return '<tr><td style="text-align: center; color: #777; padding: 10px;">لا توجد آفات مسجلة</td></tr>';
+                }
+                return validPests.map(pest => `<tr><td style="padding: 8px;">${pest}</td></tr>`).join('');
+            }
+            
+            // إنشاء HTML للشذوذ الجوي
+            function createWeatherAnomaliesHtml(anomalies) {
+                let html = '';
+                if (anomalies.highTemp && anomalies.highTempText) {
+                    html += `<p><strong>حرارة مرتفعة:</strong> ${anomalies.highTempText}</p>`;
+                }
+                if (anomalies.severeCold && anomalies.severeColdText) {
+                    html += `<p><strong>برد شديد:</strong> ${anomalies.severeColdText}</p>`;
+                }
+                if (anomalies.frost && anomalies.frostText) {
+                    html += `<p><strong>صقيع:</strong> ${anomalies.frostText}</p>`;
+                }
+                if (!html) {
+                    html = '<p>لا توجد شذوذات جوية مسجلة</p>';
+                }
+                return html;
+            }
+            
+            return `
+                <div class="preview-header">
+                    <h1>تقرير الوقاية - التقرير النصفي</h1>
+                    <p>الى دائرة زراعة قطنا - الوقاية</p>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">معلومات التقرير</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px 0; width: 100px;"><strong>الرقم:</strong></td>
+                            <td style="padding: 8px 0;">${data.reportNum || 'غير محدد'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>التاريخ:</strong></td>
+                            <td style="padding: 8px 0;">${formatDate(data.reportDate)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>نوع التقرير:</strong></td>
+                            <td style="padding: 8px 0;">تقرير النصف (${data.reportTypeText || ''}) / شهر { ${data.monthText || ''} }</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">تحديثات معلومات الطقس</h3>
+                    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 5px 0; width: 150px;"><strong>الأمطار:</strong></td>
+                                    <td style="padding: 5px 0;">${data.rainfall || '0'} ملم</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0;"><strong>متوسط درجات الحرارة:</strong></td>
+                                    <td style="padding: 5px 0;">(${data.tempMin || '0'} - ${data.tempMax || '0'}) °C</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0;"><strong>متوسط الرطوبة النسبية:</strong></td>
+                                    <td style="padding: 5px 0;">${data.avgHumidity || '0'}%</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div style="flex: 1; padding: 10px; background-color: #f0f8f0; border-radius: 5px;">
+                            <h4 style="margin-top: 0; color: #4a7c4a;">الشذوذات الجوية</h4>
+                            ${createWeatherAnomaliesHtml(data.weatherAnomalies)}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">تتبع الحالة العامة</h3>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">الأشجار المثمرة</h4>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <td style="padding: 5px 0; width: 80px;"><strong>زيتون:</strong></td>
+                            <td style="padding: 5px 0;">${data.oliveStatus || 'لا توجد معلومات'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 0;"><strong>كرمة:</strong></td>
+                            <td style="padding: 5px 0;">${data.vineStatus || 'لا توجد معلومات'}</td>
+                        </tr>
+                    </table>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">المحاصيل الحقلية</h4>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                        <tr>
+                            <td style="padding: 5px 0; width: 80px;"><strong>قمح:</strong></td>
+                            <td style="padding: 5px 0;">${data.wheatStatus || 'لا توجد معلومات'}</td>
+                        </tr>
+                    </table>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">محاصيل الخضار</h4>
+                    <div class="preview-textarea-content">
+                        ${data.vegetablesText ? data.vegetablesText.replace(/\n/g, '<br>') : 'لا توجد معلومات'}
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">الآفات المسجلة</h3>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">الأشجار المثمرة</h4>
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الآفة</th>
+                            </tr>
+                        </thead>
+                        <tbody>${createPestsHtml(data.fruitPests)}</tbody>
+                    </table>
+                    
+                    <h4 style="color: #4a7c4a; margin: 15px 0 5px 0;">المحاصيل الحقلية</h4>
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الآفة</th>
+                            </tr>
+                        </thead>
+                        <tbody>${createPestsHtml(data.fieldPests)}</tbody>
+                    </table>
+                    
+                    <h4 style="color: #4a7c4a; margin: 15px 0 5px 0;">محاصيل الخضار</h4>
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الآفة</th>
+                            </tr>
+                        </thead>
+                        <tbody>${createPestsHtml(data.vegetablePests)}</tbody>
+                    </table>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">النشاطات والإجراءات</h3>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">نشاطات الدعم الإرشادي</h4>
+                    <div class="preview-textarea-content">
+                        ${data.extensionActivities ? data.extensionActivities.replace(/\n/g, '<br>') : 'لا توجد نشاطات مسجلة'}
+                    </div>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">إجراءات المكافحة المدعومة</h4>
+                    <div class="preview-textarea-content">
+                        ${data.controlMeasures ? data.controlMeasures.replace(/\n/g, '<br>') : 'لا توجد إجراءات مسجلة'}
+                    </div>
+                    
+                    <h4 style="color: #4a7c4a; margin: 10px 0 5px 0;">ملاحظات</h4>
+                    <div class="preview-textarea-content">
+                        ${data.notes ? data.notes.replace(/\n/g, '<br>') : 'لا توجد ملاحظات'}
+                    </div>
+                </div>
+                
+                <div class="preview-signatures">
+                    <div class="preview-signature">
+                        <h4>فني الوقاية</h4>
+                        <div style="margin-top: 40px; padding-top: 10px; border-top: 1px solid #ddd; min-height: 50px;">
+                            ${data.technician || '................'}
+                        </div>
+                    </div>
+                    <div class="preview-signature">
+                        <h4>رئيس الوحدة الإرشادية في جديدة عرطوز</h4>
+                        <div style="margin-top: 40px; padding-top: 10px; border-top: 1px solid #ddd; min-height: 50px;">
+                            ${data.unitHead || '................'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
+                    <p>تم إنشاء هذا التقرير بواسطة تطبيق تقارير الوقاية</p>
+                    <p>تاريخ الإنشاء: ${formatDate(new Date().toISOString())}</p>
+                </div>
+            `;
+        }
+        
+        function generateForm2PreviewHtml(data) {
+            // تنسيق التاريخ
+            function formatDate(dateStr) {
+                if (!dateStr) return 'غير محدد';
+                try {
+                    const date = new Date(dateStr);
+                    if (isNaN(date.getTime())) return dateStr;
+                    return date.toLocaleDateString('ar-EG', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                } catch (e) {
+                    return dateStr;
+                }
+            }
+            
+            // إنشاء صفوف جدول المصائد
+            let trapsRowsHtml = '';
+            let hasData = false;
+            
+            data.traps.forEach((trap, index) => {
+                if (trap.insectName || trap.trap1 || trap.trap2 || trap.trap3 || trap.trap4) {
+                    trapsRowsHtml += `
+                        <tr style="${index % 2 === 0 ? 'background-color: #f9f9f9;' : ''}">
+                            <td>${trap.insectName || ''}</td>
+                            <td>${formatDate(trap.readingDate)}</td>
+                            <td>${trap.trap1 || '0'}</td>
+                            <td>${trap.trap2 || '0'}</td>
+                            <td>${trap.trap3 || '0'}</td>
+                            <td>${trap.trap4 || '0'}</td>
+                        </tr>
+                    `;
+                    hasData = true;
+                }
+            });
+            
+            if (!hasData) {
+                trapsRowsHtml = '<tr><td colspan="6" style="text-align: center; color: #777; padding: 20px;">لا توجد بيانات للمصائد</td></tr>';
+            }
+            
+            return `
+                <div class="preview-header">
+                    <h1>تقرير الوقاية - قراءة المصائد</h1>
+                    <p>الى دائرة زراعة قطنا - الوقاية</p>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">معلومات التقرير</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px 0; width: 100px;"><strong>الرقم:</strong></td>
+                            <td style="padding: 8px 0;">${data.reportNum || 'غير محدد'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>التاريخ:</strong></td>
+                            <td style="padding: 8px 0;">${formatDate(data.reportDate)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;"><strong>الشهر:</strong></td>
+                            <td style="padding: 8px 0;">${data.month || 'غير محدد'}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-section-title">بيانات قراءة المصائد</h3>
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الحشرة</th>
+                                <th>تاريخ القراءة</th>
+                                <th>م1</th>
+                                <th>م2</th>
+                                <th>م3</th>
+                                <th>م4</th>
+                            </tr>
+                        </thead>
+                        <tbody>${trapsRowsHtml}</tbody>
+                    </table>
+                </div>
+                
+                <div class="preview-signatures">
+                    <div class="preview-signature">
+                        <h4>فني الوقاية</h4>
+                        <div style="margin-top: 40px; padding-top: 10px; border-top: 1px solid #ddd; min-height: 50px;">
+                            ${data.technician || '................'}
+                        </div>
+                    </div>
+                    <div class="preview-signature">
+                        <h4>رئيس الوحدة الإرشادية في جديدة عرطوز</h4>
+                        <div style="margin-top: 40px; padding-top: 10px; border-top: 1px solid #ddd; min-height: 50px;">
+                            ${data.unitHead || '................'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
+                    <p>تم إنشاء هذا التقرير بواسطة تطبيق تقارير الوقاية</p>
+                    <p>تاريخ الإنشاء: ${formatDate(new Date().toISOString())}</p>
+                </div>
+            `;
+        }
+        
+        // ==================== جمع البيانات من النماذج ====================
         function collectForm1Data() {
             return {
                 reportNum: document.getElementById('reportNum1').value,
@@ -897,324 +1710,250 @@
             };
         }
         
-        function createForm1Sheet(data) {
-            const sheetData = [];
-            
-            sheetData.push(['الرقم :', data.reportNum || '', '', '', '', '']);
-            sheetData.push(['التاريخ :', data.reportDate || '', 'الى دائرة زراعة قطنا', '', '', '']);
-            sheetData.push(['', '', 'الوقاية', '', '', '']);
-            sheetData.push(['', '', `تقرير النصف (${data.reportTypeText || ''}) / شهر { ${data.monthText || ''} }`, '', '', '']);
-            sheetData.push([]);
-            
-            sheetData.push(['تحديثات معلومات الطقس', '', '', '', '', 'تحديثات الشذوذ في حالة الطقس']);
-            sheetData.push(['الأمطار', data.rainfall || '', '', '', '', data.weatherAnomalies.highTemp ? 'حرارة مرتفعة: ' + data.weatherAnomalies.highTempText : '']);
-            sheetData.push(['متوسط درجات الحرارة', `(${data.tempMin || ''} - ${data.tempMax || ''})`, '', '', '', data.weatherAnomalies.severeCold ? 'برد شديد: ' + data.weatherAnomalies.severeColdText : '']);
-            sheetData.push(['متوسط الرطوبة النسبية', data.avgHumidity || '', '', '', '', data.weatherAnomalies.frost ? 'صقيع: ' + data.weatherAnomalies.frostText : '']);
-            sheetData.push([]);
-            
-            sheetData.push(['تتبع الحالة العامة', '', '', '', '', '']);
-            sheetData.push(['الأشجار المثمرة', '', '', '', '', '']);
-            sheetData.push(['زيتون :', data.oliveStatus || '', '', '', '', '']);
-            sheetData.push(['كرمة :', data.vineStatus || '', '', '', '', '']);
-            sheetData.push(['المحاصيل الحقلية', '', '', '', '', '']);
-            sheetData.push(['قمح :', data.wheatStatus || '', '', '', '', '']);
-            sheetData.push(['محاصيل الخضار', '', '', '', '', '']);
-            
-            const vegetablesLines = (data.vegetablesText || '').split('\n');
-            for (let i = 0; i < 4; i++) {
-                sheetData.push([vegetablesLines[i] || '', '', '', '', '', '']);
-            }
-            
-            sheetData.push([]);
-            sheetData.push([]);
-            
-            sheetData.push(['الآفات المسجلة نتيجة لاعمال المسح و التحري عن الآفات الزراعية', '', '', '', '', '']);
-            sheetData.push([]);
-            
-            sheetData.push(['الأشجار المثمرة', '', '', '', '', '']);
-            for (let i = 0; i < 5; i++) {
-                sheetData.push([data.fruitPests[i] || '', '', '', '', '', '']);
-            }
-            
-            sheetData.push(['المحاصيل الحقلية', '', '', '', '', '']);
-            for (let i = 0; i < 5; i++) {
-                sheetData.push([data.fieldPests[i] || '', '', '', '', '', '']);
-            }
-            
-            sheetData.push(['محاصيل الخضار', '', '', '', '', '']);
-            for (let i = 0; i < 5; i++) {
-                sheetData.push([data.vegetablePests[i] || '', '', '', '', '', '']);
-            }
-            
-            sheetData.push(['', '', 'نشاطات الدعم الارشادي', '', '', '']);
-            const extensionLines = (data.extensionActivities || '').split('\n');
-            for (let i = 0; i < 5; i++) {
-                sheetData.push(['', '', extensionLines[i] || '', '', '', '']);
-            }
-            
-            sheetData.push(['', '', 'اجراءات المكافحة المدعومة', '', '', '']);
-            const controlLines = (data.controlMeasures || '').split('\n');
-            for (let i = 0; i < 5; i++) {
-                sheetData.push(['', '', controlLines[i] || '', '', '', '']);
-            }
-            
-            sheetData.push(['', '', 'ملاحظات { اجراءات اخرى / صعوبات و مقترحات }', '', '', '']);
-            const noteLines = (data.notes || '').split('\n');
-            for (let i = 0; i < 5; i++) {
-                sheetData.push(['', '', noteLines[i] || '', '', '', '']);
-            }
-            
-            sheetData.push([]);
-            sheetData.push(['فني الوقاية', '', '', '', 'رئيس الوحدة الارشادية في جديدة عرطوز', '']);
-            sheetData.push([data.technician || '', '', '', '', data.unitHead || '', '']);
-            
-            return sheetData;
-        }
-        
-        function createForm2Sheet(data) {
-            const sheetData = [];
-            
-            sheetData.push(['الرقم :', data.reportNum || '', '', '', '', '', '', '']);
-            sheetData.push(['التاريخ :', data.reportDate || '', 'الى دائرة زراعة قطنا', '', '', '', '', '']);
-            sheetData.push(['', '', 'الوقاية', '', '', '', '', '']);
-            sheetData.push(['', '', `تقرير قراءة المصائد عن شهر { ${data.month || ''} }`, '', '', '', '', '']);
-            sheetData.push([]);
-            
-            sheetData.push(['اسم الحشرة', '', 'تاريخ القراءة', '', 'عدد المصائد', '', '', '']);
-            sheetData.push(['', '', '', '', 'م1', 'م2', 'م3', 'م4']);
-            
-            for (let i = 0; i < 25; i++) {
-                const trap = data.traps[i] || {};
-                sheetData.push([
-                    trap.insectName || '',
-                    '',
-                    trap.readingDate || '',
-                    '',
-                    trap.trap1 || '',
-                    trap.trap2 || '',
-                    trap.trap3 || '',
-                    trap.trap4 || ''
-                ]);
-            }
-            
-            sheetData.push([]);
-            sheetData.push(['فني الوقاية', '', '', '', 'رئيس الوحدة الارشادية في جديدة عرطوز', '', '', '']);
-            sheetData.push([data.technician || '', '', '', '', data.unitHead || '', '', '', '']);
-            
-            return sheetData;
-        }
-        
-        // ==================== زر تصدير PDF - طريقة جديدة بدون مكتبات خارجية ====================
-        function exportToPdf() {
+        // ==================== إدارة التخزين المحلي ====================
+        function saveCurrentFormData() {
             try {
-                showNotification('جاري إنشاء PDF...', 'info');
-                
                 const activeForm = document.querySelector('.form-container.active');
                 const formId = activeForm.id;
                 
-                if (!formId) {
-                    showNotification('لم يتم العثور على النموذج النشط', 'error');
+                if (!formId) return;
+                
+                let formData;
+                let formType;
+                
+                if (formId === 'form1') {
+                    formData = collectForm1Data();
+                    formType = 'form1';
+                } else if (formId === 'form2') {
+                    formData = collectForm2Data();
+                    formType = 'form2';
+                } else {
                     return;
                 }
                 
-                // إنشاء HTML للـPDF
-                let pdfHtml = '';
-                let fileName = '';
+                // حفظ البيانات المحلية
+                localStorage.setItem('current_' + formType, JSON.stringify(formData));
                 
-                if (formId === 'form1') {
-                    pdfHtml = generateForm1PdfHtml();
-                    fileName = 'تقرير_الوقاية_النصفي';
-                } else if (formId === 'form2') {
-                    pdfHtml = generateForm2PdfHtml();
-                    fileName = 'تقرير_المصائد';
-                }
-                
-                // عرض PDF في نافذة جديدة مع خيارات الطباعة
-                showPdfWindow(pdfHtml, fileName);
-                
-                // حفظ معلومات ملف PDF في التخزين المحلي
-                savePdfFileToStorage(fileName + '.pdf', formId);
+                // حفظ في قائمة التقارير
+                saveReportToStorage(formData, formType);
                 
             } catch (error) {
-                console.error('خطأ في تصدير PDF:', error);
-                showNotification('حدث خطأ في تصدير PDF', 'error');
+                console.error('خطأ في حفظ البيانات:', error);
             }
         }
         
-        function showPdfWindow(pdfHtml, fileName) {
-            // إنشاء نافذة PDF
-            const pdfWindow = document.createElement('div');
-            pdfWindow.className = 'pdf-window';
-            pdfWindow.innerHTML = `
-                <button class="pdf-close-btn" onclick="closePdfWindow()">
-                    <i class="fas fa-times"></i> إغلاق
-                </button>
-                <button class="pdf-print-btn" onclick="printPdf()">
-                    <i class="fas fa-print"></i> طباعة/حفظ PDF
-                </button>
-                <div class="pdf-content">
-                    ${pdfHtml}
-                </div>
-            `;
-            
-            document.body.appendChild(pdfWindow);
-            
-            // إضافة الأحداث للنافذة
-            window.closePdfWindow = function() {
-                document.body.removeChild(pdfWindow);
-            };
-            
-            window.printPdf = function() {
-                // حل مشكلة الطباعة على الموبايل
-                const printContent = `
-                    <!DOCTYPE html>
-                    <html dir="rtl" lang="ar">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>${fileName}</title>
-                        <style>
-                            body { 
-                                font-family: Arial, sans-serif; 
-                                direction: rtl; 
-                                padding: 20mm; 
-                                margin: 0;
-                                line-height: 1.6;
-                            }
-                            .pdf-content {
-                                max-width: 210mm;
-                                margin: 0 auto;
-                            }
-                            .pdf-header {
-                                text-align: center;
-                                margin-bottom: 30px;
-                                padding-bottom: 20px;
-                                border-bottom: 3px solid #2d5e2d;
-                            }
-                            .pdf-header h1 {
-                                color: #2d5e2d;
-                                margin-bottom: 10px;
-                                font-size: 28px;
-                            }
-                            .pdf-header p {
-                                color: #4a7c4a;
-                                font-size: 18px;
-                            }
-                            .pdf-section {
-                                margin-bottom: 25px;
-                                padding: 20px;
-                                border-right: 4px solid #2d5e2d;
-                                background-color: #f9fdf9;
-                                border-radius: 8px;
-                            }
-                            .pdf-section-title {
-                                color: #2d5e2d;
-                                font-size: 20px;
-                                margin-bottom: 15px;
-                                padding-bottom: 10px;
-                                border-bottom: 1px solid #ddd;
-                            }
-                            .pdf-table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin: 15px 0;
-                            }
-                            .pdf-table th {
-                                background-color: #2d5e2d;
-                                color: white;
-                                padding: 10px;
-                                text-align: right;
-                                font-weight: bold;
-                            }
-                            .pdf-table td {
-                                padding: 10px;
-                                border: 1px solid #ddd;
-                                text-align: right;
-                            }
-                            .pdf-table tr:nth-child(even) {
-                                background-color: #f9f9f9;
-                            }
-                            .pdf-signatures {
-                                display: flex;
-                                justify-content: space-between;
-                                margin-top: 50px;
-                                padding-top: 30px;
-                                border-top: 2px solid #ddd;
-                            }
-                            .pdf-signature {
-                                text-align: center;
-                                width: 45%;
-                            }
-                            .pdf-signature h4 {
-                                margin-bottom: 15px;
-                                color: #2d5e2d;
-                                font-size: 18px;
-                                font-weight: bold;
-                            }
-                            .pdf-textarea-content {
-                                white-space: pre-line;
-                                line-height: 1.8;
-                                padding: 10px;
-                                background-color: #f9f9f9;
-                                border-radius: 5px;
-                                border: 1px solid #ddd;
-                            }
-                            @media print {
-                                body { 
-                                    margin: 0;
-                                    padding: 0;
-                                }
-                                .pdf-content {
-                                    padding: 0;
-                                    margin: 0;
-                                    box-shadow: none;
-                                }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${pdfHtml}
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                            }
-                        <\/script>
-                    </body>
-                    </html>
-                `;
-                
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(printContent);
-                printWindow.document.close();
-                
-                // إغلاق النافذة بعد الطباعة
-                printWindow.onafterprint = function() {
-                    setTimeout(() => {
-                        printWindow.close();
-                    }, 500);
-                };
-            };
-        }
-        
-        // ==================== دالة تنسيق التاريخ الميلادي ====================
-        function formatGregorianDate(dateStr) {
-            if (!dateStr) return 'غير محدد';
+        function loadSavedData() {
             try {
-                const date = new Date(dateStr);
-                if (isNaN(date.getTime())) return dateStr;
+                const activeForm = document.querySelector('.form-container.active');
+                const formId = activeForm.id;
                 
-                return date.toLocaleDateString('ar-EG', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            } catch (e) {
-                return dateStr;
+                if (!formId) return;
+                
+                const savedData = localStorage.getItem('current_' + formId);
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    if (formId === 'form1') {
+                        loadForm1Data(data);
+                    } else if (formId === 'form2') {
+                        loadForm2Data(data);
+                    }
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
             }
         }
         
-        // دالة تنسيق التاريخ للعرض في الملفات المحفوظة
-        function formatFileDate(dateStr) {
+        function loadForm1Data(data) {
+            if (!data) return;
+            
+            document.getElementById('reportNum1').value = data.reportNum || '';
+            document.getElementById('reportDate1').value = data.reportDate || '';
+            document.getElementById('reportTypeText').value = data.reportTypeText || '';
+            document.getElementById('monthText').value = data.monthText || '';
+            document.getElementById('rainfall').value = data.rainfall || '';
+            document.getElementById('tempMin').value = data.tempMin || '';
+            document.getElementById('tempMax').value = data.tempMax || '';
+            document.getElementById('avgHumidity').value = data.avgHumidity || '';
+            
+            if (data.weatherAnomalies) {
+                document.getElementById('highTemp').checked = data.weatherAnomalies.highTemp || false;
+                document.getElementById('highTempText').value = data.weatherAnomalies.highTempText || '';
+                document.getElementById('highTempText').disabled = !data.weatherAnomalies.highTemp;
+                
+                document.getElementById('severeCold').checked = data.weatherAnomalies.severeCold || false;
+                document.getElementById('severeColdText').value = data.weatherAnomalies.severeColdText || '';
+                document.getElementById('severeColdText').disabled = !data.weatherAnomalies.severeCold;
+                
+                document.getElementById('frost').checked = data.weatherAnomalies.frost || false;
+                document.getElementById('frostText').value = data.weatherAnomalies.frostText || '';
+                document.getElementById('frostText').disabled = !data.weatherAnomalies.frost;
+            }
+            
+            document.getElementById('olive').value = data.oliveStatus || '';
+            document.getElementById('vine').value = data.vineStatus || '';
+            document.getElementById('wheat').value = data.wheatStatus || '';
+            document.getElementById('vegetablesText').value = data.vegetablesText || '';
+            document.getElementById('extensionActivities').value = data.extensionActivities || '';
+            document.getElementById('controlMeasures').value = data.controlMeasures || '';
+            document.getElementById('notes').value = data.notes || '';
+            document.getElementById('technician1').value = data.technician || '';
+            document.getElementById('unitHead1').value = data.unitHead || '';
+            
+            if (data.fruitPests) {
+                const fruitInputs = document.querySelectorAll('#fruitPestsTable tbody input');
+                data.fruitPests.forEach((pest, index) => {
+                    if (fruitInputs[index]) fruitInputs[index].value = pest || '';
+                });
+            }
+            
+            if (data.fieldPests) {
+                const fieldInputs = document.querySelectorAll('#fieldPestsTable tbody input');
+                data.fieldPests.forEach((pest, index) => {
+                    if (fieldInputs[index]) fieldInputs[index].value = pest || '';
+                });
+            }
+            
+            if (data.vegetablePests) {
+                const vegetableInputs = document.querySelectorAll('#vegetablePestsTable tbody input');
+                data.vegetablePests.forEach((pest, index) => {
+                    if (vegetableInputs[index]) vegetableInputs[index].value = pest || '';
+                });
+            }
+        }
+        
+        function loadForm2Data(data) {
+            if (!data) return;
+            
+            document.getElementById('reportNum2').value = data.reportNum || '';
+            document.getElementById('reportDate2').value = data.reportDate || '';
+            document.getElementById('monthTrapsText').value = data.month || '';
+            document.getElementById('technician2').value = data.technician || '';
+            document.getElementById('unitHead2').value = data.unitHead || '';
+            
+            if (data.traps) {
+                const trapRows = document.querySelectorAll('#trapsTable tbody tr');
+                data.traps.forEach((trap, index) => {
+                    if (trapRows[index]) {
+                        const inputs = trapRows[index].querySelectorAll('input');
+                        inputs[0].value = trap.insectName || '';
+                        inputs[1].value = trap.readingDate || '';
+                        inputs[2].value = trap.trap1 || '';
+                        inputs[3].value = trap.trap2 || '';
+                        inputs[4].value = trap.trap3 || '';
+                        inputs[5].value = trap.trap4 || '';
+                    }
+                });
+            }
+        }
+        
+        function saveReportToStorage(reportData, formType) {
+            try {
+                let reports = getStoredReports();
+                const reportId = Date.now();
+                
+                let reportName = '';
+                if (formType === 'form1') {
+                    reportName = `تقرير نصفي - ${reportData.reportTypeText || ''} - ${reportData.monthText || ''} - ${reportData.reportNum || ''}`;
+                } else if (formType === 'form2') {
+                    reportName = `تقرير المصائد - ${reportData.month || ''} - ${reportData.reportNum || ''}`;
+                }
+                
+                const reportInfo = {
+                    id: reportId,
+                    name: reportName || 'تقرير بدون عنوان',
+                    type: formType,
+                    date: new Date().toISOString(),
+                    data: reportData
+                };
+                
+                reports.push(reportInfo);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+                
+                return reportInfo;
+                
+            } catch (error) {
+                console.error('خطأ في حفظ التقرير:', error);
+                throw error;
+            }
+        }
+        
+        function getStoredReports() {
+            try {
+                const reportsJson = localStorage.getItem(STORAGE_KEY);
+                return reportsJson ? JSON.parse(reportsJson) : [];
+            } catch (error) {
+                console.error('خطأ في قراءة التقارير:', error);
+                return [];
+            }
+        }
+        
+        function loadAndDisplayReports() {
+            try {
+                const reports = getStoredReports();
+                const filesList = document.getElementById('filesList');
+                
+                if (reports.length === 0) {
+                    filesList.innerHTML = '<div class="empty-files">لا توجد تقارير محفوظة بعد</div>';
+                    return;
+                }
+                
+                // ترتيب التقارير من الأحدث إلى الأقدم
+                reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+                filesList.innerHTML = '';
+                
+                reports.forEach((report, index) => {
+                    const dateStr = formatReportDate(report.date);
+                    const reportIcon = report.type === 'form1' ? 'fa-file-alt' : 'fa-bug';
+                    const reportType = report.type === 'form1' ? 'نصفي' : 'مصائد';
+                    
+                    const reportItem = document.createElement('div');
+                    reportItem.className = 'file-item';
+                    reportItem.innerHTML = `
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <i class="fas ${reportIcon}" style="color: #2d5e2d"></i>
+                            </div>
+                            <div>
+                                <div class="file-name">${report.name}</div>
+                                <div class="file-date">${dateStr} - ${reportType}</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="download-btn" data-id="${report.id}" data-index="${index}">
+                                <i class="fas fa-eye"></i> معاينة
+                            </button>
+                            <button class="delete-btn" data-id="${report.id}">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    `;
+                    
+                    filesList.appendChild(reportItem);
+                });
+                
+                // إضافة أحداث للأزرار
+                document.querySelectorAll('.download-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const reportId = parseInt(this.getAttribute('data-id'));
+                        const reportIndex = parseInt(this.getAttribute('data-index'));
+                        previewStoredReport(reportId, reportIndex);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const reportId = parseInt(this.getAttribute('data-id'));
+                        deleteReport(reportId);
+                    });
+                });
+            } catch (error) {
+                console.error('خطأ في عرض التقارير:', error);
+                document.getElementById('filesList').innerHTML = 
+                    '<div class="empty-files">حدث خطأ في تحميل التقارير</div>';
+            }
+        }
+        
+        function formatReportDate(dateStr) {
             if (!dateStr) return '';
             try {
                 const date = new Date(dateStr);
@@ -1232,452 +1971,60 @@
             }
         }
         
-        function generateForm1PdfHtml() {
-            const data = collectForm1Data();
-            
-            // استخدام دالة تنسيق التاريخ الميلادي
-            const formatDate = formatGregorianDate;
-            
-            // إنشاء قائمة الآفات
-            function createPestsHtml(pestsArray) {
-                const validPests = pestsArray.filter(pest => pest && pest.trim() !== '');
-                if (validPests.length === 0) {
-                    return '<tr><td style="padding: 8px; border: 1px solid #ddd;">لا توجد آفات مسجلة</td></tr>';
-                }
-                
-                return validPests.map(pest => `<tr><td style="padding: 8px; border: 1px solid #ddd;">${pest}</td></tr>`).join('');
-            }
-            
-            return `
-                <div style="direction: rtl; text-align: right;">
-                    <div class="pdf-header">
-                        <h1>تقرير الوقاية - التقرير النصفي</h1>
-                        <p>الى دائرة زراعة قطنا - الوقاية</p>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">معلومات التقرير</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 5px 0; width: 100px;"><strong>الرقم:</strong></td>
-                                <td style="padding: 5px 0;">${data.reportNum || 'غير محدد'}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>التاريخ:</strong></td>
-                                <td style="padding: 5px 0;">${formatDate(data.reportDate)}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>نوع التقرير:</strong></td>
-                                <td style="padding: 5px 0;">تقرير النصف (${data.reportTypeText || ''}) / شهر { ${data.monthText || ''} }</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">تحديثات معلومات الطقس</h3>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
-                            <tr>
-                                <td style="padding: 5px 0; width: 150px;"><strong>الأمطار:</strong></td>
-                                <td style="padding: 5px 0;">${data.rainfall || '0'} ملم</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>متوسط درجات الحرارة:</strong></td>
-                                <td style="padding: 5px 0;">(${data.tempMin || '0'} - ${data.tempMax || '0'}) °C</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>متوسط الرطوبة النسبية:</strong></td>
-                                <td style="padding: 5px 0;">${data.avgHumidity || '0'}%</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">تتبع الحالة العامة</h3>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">الأشجار المثمرة</h4>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
-                            <tr>
-                                <td style="padding: 5px 0; width: 80px;"><strong>زيتون:</strong></td>
-                                <td style="padding: 5px 0;">${data.oliveStatus || 'لا توجد معلومات'}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>كرمة:</strong></td>
-                                <td style="padding: 5px 0;">${data.vineStatus || 'لا توجد معلومات'}</td>
-                            </tr>
-                        </table>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">المحاصيل الحقلية</h4>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
-                            <tr>
-                                <td style="padding: 5px 0; width: 80px;"><strong>قمح:</strong></td>
-                                <td style="padding: 5px 0;">${data.wheatStatus || 'لا توجد معلومات'}</td>
-                            </tr>
-                        </table>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">محاصيل الخضار</h4>
-                        <div class="pdf-textarea-content">
-                            ${data.vegetablesText ? data.vegetablesText.replace(/\n/g, '<br>') : 'لا توجد معلومات'}
-                        </div>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">الآفات المسجلة</h3>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">الأشجار المثمرة</h4>
-                        <table class="pdf-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم الآفة</th>
-                                </tr>
-                            </thead>
-                            <tbody>${createPestsHtml(data.fruitPests)}</tbody>
-                        </table>
-                        
-                        <h4 style="color: #4a7c4a; margin: 15px 0 5px 0; font-size: 16px;">المحاصيل الحقلية</h4>
-                        <table class="pdf-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم الآفة</th>
-                                </tr>
-                            </thead>
-                            <tbody>${createPestsHtml(data.fieldPests)}</tbody>
-                        </table>
-                        
-                        <h4 style="color: #4a7c4a; margin: 15px 0 5px 0; font-size: 16px;">محاصيل الخضار</h4>
-                        <table class="pdf-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم الآفة</th>
-                                </tr>
-                            </thead>
-                            <tbody>${createPestsHtml(data.vegetablePests)}</tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">النشاطات والإجراءات</h3>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">نشاطات الدعم الإرشادي</h4>
-                        <div class="pdf-textarea-content">
-                            ${data.extensionActivities ? data.extensionActivities.replace(/\n/g, '<br>') : 'لا توجد نشاطات مسجلة'}
-                        </div>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">إجراءات المكافحة المدعومة</h4>
-                        <div class="pdf-textarea-content">
-                            ${data.controlMeasures ? data.controlMeasures.replace(/\n/g, '<br>') : 'لا توجد إجراءات مسجلة'}
-                        </div>
-                        
-                        <h4 style="color: #4a7c4a; margin: 10px 0 5px 0; font-size: 16px;">ملاحظات</h4>
-                        <div class="pdf-textarea-content">
-                            ${data.notes ? data.notes.replace(/\n/g, '<br>') : 'لا توجد ملاحظات'}
-                        </div>
-                    </div>
-                    
-                    <div class="pdf-signatures">
-                        <div class="pdf-signature">
-                            <h4>فني الوقاية</h4>
-                            <p>${data.technician || '................'}</p>
-                        </div>
-                        <div class="pdf-signature">
-                            <h4>رئيس الوحدة الإرشادية في جديدة عرطوز</h4>
-                            <p>${data.unitHead || '................'}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function generateForm2PdfHtml() {
-            const data = collectForm2Data();
-            
-            // استخدام دالة تنسيق التاريخ الميلادي
-            const formatDate = formatGregorianDate;
-            
-            // إنشاء صفوف جدول المصائد
-            let trapsRowsHtml = '';
-            let hasData = false;
-            
-            data.traps.forEach((trap, index) => {
-                if (trap.insectName || trap.trap1 || trap.trap2 || trap.trap3 || trap.trap4) {
-                    trapsRowsHtml += `
-                        <tr style="${index % 2 === 0 ? 'background-color: #f9f9f9;' : ''}">
-                            <td>${trap.insectName || ''}</td>
-                            <td>${formatDate(trap.readingDate)}</td>
-                            <td>${trap.trap1 || ''}</td>
-                            <td>${trap.trap2 || ''}</td>
-                            <td>${trap.trap3 || ''}</td>
-                            <td>${trap.trap4 || ''}</td>
-                        </tr>
-                    `;
-                    hasData = true;
-                }
-            });
-            
-            if (!hasData) {
-                trapsRowsHtml = '<tr><td colspan="6" style="text-align: center; color: #777;">لا توجد بيانات للمصائد</td></tr>';
-            }
-            
-            return `
-                <div style="direction: rtl; text-align: right;">
-                    <div class="pdf-header">
-                        <h1>تقرير الوقاية - قراءة المصائد</h1>
-                        <p>الى دائرة زراعة قطنا - الوقاية</p>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">معلومات التقرير</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 5px 0; width: 100px;"><strong>الرقم:</strong></td>
-                                <td style="padding: 5px 0;">${data.reportNum || 'غير محدد'}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>التاريخ:</strong></td>
-                                <td style="padding: 5px 0;">${formatDate(data.reportDate)}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0;"><strong>الشهر:</strong></td>
-                                <td style="padding: 5px 0;">${data.month || 'غير محدد'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div class="pdf-section">
-                        <h3 class="pdf-section-title">بيانات قراءة المصائد</h3>
-                        <table class="pdf-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم الحشرة</th>
-                                    <th>تاريخ القراءة</th>
-                                    <th>م1</th>
-                                    <th>م2</th>
-                                    <th>م3</th>
-                                    <th>م4</th>
-                                </tr>
-                            </thead>
-                            <tbody>${trapsRowsHtml}</tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="pdf-signatures">
-                        <div class="pdf-signature">
-                            <h4>فني الوقاية</h4>
-                            <p>${data.technician || '................'}</p>
-                        </div>
-                        <div class="pdf-signature">
-                            <h4>رئيس الوحدة الإرشادية في جديدة عرطوز</h4>
-                            <p>${data.unitHead || '................'}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // ==================== إدارة التخزين المحلي ====================
-        function saveExcelFileToStorage(fileName, formType, jsonData) {
+        function previewStoredReport(reportId, reportIndex = -1) {
             try {
-                let files = getStoredFiles();
-                const fileId = Date.now();
+                const reports = getStoredReports();
+                let report;
                 
-                const fileInfo = {
-                    id: fileId,
-                    name: fileName,
-                    type: formType,
-                    date: new Date().toISOString(),
-                    json: jsonData,  // حفظ البيانات فقط
-                    fileType: 'excel'
+                if (reportIndex >= 0 && reportIndex < reports.length) {
+                    report = reports[reportIndex];
+                } else {
+                    report = reports.find(r => r.id === reportId);
+                }
+                
+                if (!report) {
+                    showNotification('التقرير غير موجود', 'error');
+                    return;
+                }
+                
+                // إنشاء HTML للمعاينة
+                let previewHtml = '';
+                if (report.type === 'form1') {
+                    previewHtml = generateForm1PreviewHtml(report.data);
+                } else if (report.type === 'form2') {
+                    previewHtml = generateForm2PreviewHtml(report.data);
+                }
+                
+                // حفظ بيانات التقرير مؤقتاً للتنزيل
+                window.currentReportData = {
+                    html: previewHtml,
+                    title: report.name,
+                    data: report.data,
+                    type: report.type
                 };
                 
-                files.push(fileInfo);
-                localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(files));
+                // عرض نافذة المعاينة
+                showPreviewWindow(previewHtml, report.name);
                 
-                console.log('تم حفظ بيانات الملف:', fileName);
-                return fileInfo;
+                showNotification('تم عرض التقرير المحفوظ', 'success');
                 
             } catch (error) {
-                console.error('خطأ في حفظ ملف Excel:', error);
-                showNotification('حدث خطأ في حفظ الملف', 'error');
-                throw error;
+                console.error('خطأ في معاينة التقرير:', error);
+                showNotification('حدث خطأ في معاينة التقرير', 'error');
             }
         }
         
-        function savePdfFileToStorage(fileName, formType) {
-            try {
-                let files = getStoredFiles();
-                const fileId = Date.now();
-                
-                const fileInfo = {
-                    id: fileId,
-                    name: fileName,
-                    type: formType,
-                    date: new Date().toISOString(),
-                    fileType: 'pdf'
-                };
-                
-                files.push(fileInfo);
-                localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(files));
-                
-                showNotification('تم حفظ ملف PDF في الأرشيف', 'success');
-            } catch (error) {
-                console.error('خطأ في حفظ معلومات ملف PDF:', error);
-            }
-        }
-        
-        function getStoredFiles() {
-            try {
-                const filesJson = localStorage.getItem(STORAGE_KEYS.FILES);
-                return filesJson ? JSON.parse(filesJson) : [];
-            } catch (error) {
-                console.error('خطأ في قراءة الملفات:', error);
-                return [];
-            }
-        }
-        
-        function loadAndDisplayFiles() {
-            try {
-                const files = getStoredFiles();
-                const filesList = document.getElementById('filesList');
-                
-                console.log('عدد الملفات المحفوظة:', files.length);
-                
-                if (files.length === 0) {
-                    filesList.innerHTML = '<div class="empty-files">لا توجد ملفات محفوظة بعد</div>';
-                    return;
-                }
-                
-                // ترتيب الملفات من الأحدث إلى الأقدم
-                files.sort((a, b) => new Date(b.date) - new Date(a.date));
-                filesList.innerHTML = '';
-                
-                files.forEach((file, index) => {
-                    const dateStr = formatFileDate(file.date);
-                    
-                    const fileIcon = file.fileType === 'pdf' ? 'fa-file-pdf' : 'fa-file-excel';
-                    const fileTypeText = file.fileType === 'pdf' ? 'PDF' : 'Excel';
-                    const iconColor = file.fileType === 'pdf' ? '#d9534f' : '#2d5e2d';
-                    
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <div class="file-info">
-                            <div class="file-icon">
-                                <i class="fas ${fileIcon}" style="color: ${iconColor}"></i>
-                            </div>
-                            <div>
-                                <div class="file-name">${file.name}</div>
-                                <div class="file-date">${dateStr} - ${fileTypeText}</div>
-                            </div>
-                        </div>
-                        <div class="file-actions">
-                            ${file.fileType === 'excel' ? `
-                            <button class="download-btn" data-id="${file.id}" data-index="${index}">
-                                <i class="fas fa-download"></i> تحميل
-                            </button>
-                            ` : `
-                            <button class="download-btn" data-id="${file.id}" style="opacity: 0.5; cursor: not-allowed;" title="ملف PDF - استخدم الزر طباعة/حفظ PDF">
-                                <i class="fas fa-download"></i> تحميل
-                            </button>
-                            `}
-                            <button class="delete-btn" data-id="${file.id}">
-                                <i class="fas fa-trash"></i> حذف
-                            </button>
-                        </div>
-                    `;
-                    
-                    filesList.appendChild(fileItem);
-                });
-                
-                // إضافة أحداث للأزرار
-                document.querySelectorAll('.download-btn:not([style*="not-allowed"])').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const fileId = parseInt(this.getAttribute('data-id'));
-                        const fileIndex = parseInt(this.getAttribute('data-index'));
-                        downloadFile(fileId, fileIndex);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const fileId = parseInt(this.getAttribute('data-id'));
-                        deleteFile(fileId);
-                    });
-                });
-            } catch (error) {
-                console.error('خطأ في عرض الملفات:', error);
-                document.getElementById('filesList').innerHTML = 
-                    '<div class="empty-files">حدث خطأ في تحميل الملفات</div>';
-            }
-        }
-        
-        function downloadFile(fileId, fileIndex = -1) {
-            try {
-                const files = getStoredFiles();
-                let file;
-                
-                if (fileIndex >= 0 && fileIndex < files.length) {
-                    file = files[fileIndex];
-                } else {
-                    file = files.find(f => f.id === fileId);
-                }
-                
-                if (!file) {
-                    showNotification('الملف غير موجود', 'error');
-                    return;
-                }
-                
-                if (file.fileType !== 'excel') {
-                    showNotification('لا يمكن تحميل هذا النوع من الملفات', 'error');
-                    return;
-                }
-                
-                console.log('تحميل الملف:', file.name);
-                
-                // إنشاء ملف excel من البيانات JSON
-                if (!file.json) {
-                    showNotification('بيانات الملف غير موجودة', 'error');
-                    return;
-                }
-                
-                showNotification('جاري إنشاء الملف...', 'info');
-                
-                let wb;
-                
-                if (file.type === 'form1') {
-                    wb = XLSX.utils.book_new();
-                    const wsData = createForm1Sheet(file.json);
-                    const ws = XLSX.utils.aoa_to_sheet(wsData);
-                    XLSX.utils.book_append_sheet(wb, ws, 'تقرير نصفي');
-                } else if (file.type === 'form2') {
-                    wb = XLSX.utils.book_new();
-                    const wsData = createForm2Sheet(file.json);
-                    const ws = XLSX.utils.aoa_to_sheet(wsData);
-                    XLSX.utils.book_append_sheet(wb, ws, 'تقرير المصائد');
-                } else {
-                    showNotification('نوع الملف غير معروف', 'error');
-                    return;
-                }
-                
-                // تحميل الملف
-                XLSX.writeFile(wb, file.name);
-                showNotification('تم تحميل الملف بنجاح', 'success');
-                
-            } catch (error) {
-                console.error('خطأ في تحميل الملف:', error);
-                showNotification('حدث خطأ في تحميل الملف', 'error');
-            }
-        }
-        
-        function deleteFile(fileId) {
-            if (confirm('هل أنت متأكد من رغبتك في حذف هذا الملف؟')) {
+        function deleteReport(reportId) {
+            if (confirm('هل أنت متأكد من رغبتك في حذف هذا التقرير؟')) {
                 try {
-                    let files = getStoredFiles();
-                    files = files.filter(f => f.id !== fileId);
-                    localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(files));
-                    loadAndDisplayFiles();
-                    showNotification('تم حذف الملف', 'success');
+                    let reports = getStoredReports();
+                    reports = reports.filter(r => r.id !== reportId);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+                    loadAndDisplayReports();
+                    showNotification('تم حذف التقرير', 'success');
                 } catch (error) {
-                    console.error('خطأ في حذف الملف:', error);
-                    showNotification('حدث خطأ في حذف الملف', 'error');
+                    console.error('خطأ في حذف التقرير:', error);
+                    showNotification('حدث خطأ في حذف التقرير', 'error');
                 }
             }
         }
@@ -1698,11 +2045,16 @@
                 console.error('خطأ في عرض الإشعار:', error);
             }
         }
+        
+        // ==================== أحداث التبويب ====================
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+                loadSavedData();
+            });
+        });
     </script>
 </body>
-</html>
-    
-  </body>
-  
 </html>
 
