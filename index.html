@@ -1,31 +1,45 @@
-
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>Untitled</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تطبيق تعبئة تقرير الوقاية</title>
+    
+    <!-- ===== أيقونات زراعية للتثبيت على الشاشة الرئيسية ===== -->
+    <!-- أيقونة المتصفح الأساسية -->
+    <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    
+    <!-- أيقونات آيفون (Apple Touch Icons) -->
+    <link rel="apple-touch-icon" sizes="57x57" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="60x60" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="72x72" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="76x76" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="114x114" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="120x120" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="144x144" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="152x152" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    
+    <!-- أيقونات الأندرويد -->
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232d5e2d'/%3E%3Cpath d='M30 40 Q50 20 70 40 L65 45 Q50 25 35 45 Z' fill='%23f0ad4e'/%3E%3Ccircle cx='50' cy='55' r='20' fill='%23f0ad4e'/%3E%3Ccircle cx='45' cy='50' r='3' fill='%23333'/%3E%3Ccircle cx='55' cy='50' r='3' fill='%23333'/%3E%3Cpath d='M45 60 Q50 65 55 60' stroke='%23333' stroke-width='2' fill='none'/%3E%3Ctext x='30' y='85' fill='white' font-size='20' font-weight='bold'%3Eوقاية%3C/text%3E%3C/svg%3E">
+    
+    <!-- ملف Manifest للتطبيق -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20%D8%AA%D9%82%D8%A7%D8%B1%D9%8A%D8%B1%20%D8%A7%D9%84%D9%88%D9%82%D8%A7%D9%8A%D8%A9%22%2C%22short_name%22%3A%22%D8%A7%D9%84%D9%88%D9%82%D8%A7%D9%8A%D8%A9%22%2C%22description%22%3A%22%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20%D9%84%D8%AA%D8%B9%D8%A8%D8%A6%D8%A9%20%D8%AA%D9%82%D8%A7%D8%B1%D9%8A%D8%B1%20%D8%A7%D9%84%D9%88%D9%82%D8%A7%D9%8A%D8%A9%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f8f0%22%2C%22theme_color%22%3A%22%232d5e2d%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image/svg+xml,%253Csvg%2520xmlns='http://www.w3.org/2000/svg'%2520viewBox='0%25200%2520100%2520100'%253E%253Ccircle%2520cx='50'%2520cy='50'%2520r='45'%2520fill='%25232d5e2d'/%253E%253Cpath%2520d='M30%252040%2520Q50%252020%252070%252040%2520L65%252045%2520Q50%252025%252035%252045%2520Z'%2520fill='%2523f0ad4e'/%253E%253Ccircle%2520cx='50'%2520cy='55'%2520r='20'%2520fill='%2523f0ad4e'/%253E%253Ccircle%2520cx='45'%2520cy='50'%2520r='3'%2520fill='%2523333'/%253E%253Ccircle%2520cx='55'%2520cy='50'%2520r='3'%2520fill='%2523333'/%253E%253Cpath%2520d='M45%252060%2520Q50%252065%252055%252060'%2520stroke='%2523333'%2520stroke-width='2'%2520fill='none'/%253E%253Ctext%2520x='30'%2520y='85'%2520fill='white'%2520font-size='20'%2520font-weight='bold'%253E%25D9%2588%25D9%2582%25D8%25A7%25D9%258A%25D8%25A9%253C/text%253E%253C/svg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/svg+xml%22%7D%2C%7B%22src%22%3A%22data:image/svg+xml,%253Csvg%2520xmlns='http://www.w3.org/2000/svg'%2520viewBox='0%25200%2520100%2520100'%253E%253Ccircle%2520cx='50'%2520cy='50'%2520r='45'%2520fill='%25232d5e2d'/%253E%253Cpath%2520d='M30%252040%2520Q50%252020%252070%252040%2520L65%252045%2520Q50%252025%252035%252045%2520Z'%2520fill='%2523f0ad4e'/%253E%253Ccircle%2520cx='50'%2520cy='55'%2520r='20'%2520fill='%2523f0ad4e'/%253E%253Ccircle%2520cx='45'%2520cy='50'%2520r='3'%2520fill='%2523333'/%253E%253Ccircle%2520cx='55'%2520cy='50'%2520r='3'%2520fill='%2523333'/%253E%253Cpath%2520d='M45%252060%2520Q50%252065%252055%252060'%2520stroke='%2523333'%2520stroke-width='2'%2520fill='none'/%253E%253Ctext%2520x='30'%2520y='85'%2520fill='white'%2520font-size='20'%2520font-weight='bold'%253E%25D9%2588%25D9%2582%25D8%25A7%25D9%258A%25D8%25A9%253C/text%253E%253C/svg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/svg+xml%22%7D%5D%7D">
+    
+    <!-- مكتبة Font Awesome للأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة html2pdf لتحويل التقرير إلى PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        /* تعديل الـ body لإضافة مساحة للأشرطة الثابتة */
         body { 
             background-color: #f0f8f0; 
             color: #333; 
             line-height: 1.6; 
-            padding: 70px 20px 60px 20px; /* زيادة المساحة في الأعلى والأسفل */
+            padding: 70px 20px 60px 20px;
             min-height: 100vh;
             position: relative;
         }
@@ -146,7 +160,7 @@
         .signature-row { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
         .signature { text-align: center; width: 45%; }
         .signature input { text-align: center; font-weight: 600; color: #2d5e2d; }
-        .notification { position: fixed; bottom: 80px; right: 20px; padding: 15px 25px; background-color: #2d5e2d; color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: none; z-index: 10000; animation: slideIn 0.5s ease; } /* تعديل المسافة من الأسفل */
+        .notification { position: fixed; bottom: 80px; right: 20px; padding: 15px 25px; background-color: #2d5e2d; color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: none; z-index: 10000; animation: slideIn 0.5s ease; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .traps-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .traps-table th, .traps-table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
@@ -240,7 +254,7 @@
         /* زر المساعدة */
         .help-btn {
             position: fixed;
-            bottom: 80px; /* تعديل المسافة لتصبح فوق الشريط السفلي */
+            bottom: 80px;
             left: 20px;
             background: #3a7bd5;
             color: white;
@@ -313,8 +327,8 @@
             overflow: auto;
             padding: 20px;
             direction: rtl;
-            padding-top: 70px; /* لعدم التداخل مع الشريط الثابت العلوي */
-            padding-bottom: 60px; /* لعدم التداخل مع الشريط الثابت السفلي */
+            padding-top: 70px;
+            padding-bottom: 60px;
         }
         
         .preview-content {
@@ -415,7 +429,7 @@
         /* أزرار التحكم في المعاينة */
         .preview-controls {
             position: fixed;
-            top: 80px; /* تعديل المسافة لتكون أسفل الشريط العلوي مباشرة */
+            top: 80px;
             left: 20px;
             background: white;
             padding: 15px;
@@ -525,8 +539,8 @@
             .help-btn { bottom: 70px; left: 10px; width: 40px; height: 40px; }
             .preview-controls { top: 80px; left: 10px; flex-direction: column; }
             .preview-content { padding: 10mm; }
-            .fixed-header .date-time { display: none; } /* إخفاء الوقت في الشاشات الصغيرة */
-            .fixed-footer .version { display: none; } /* إخفاء النسخة في الشاشات الصغيرة */
+            .fixed-header .date-time { display: none; }
+            .fixed-footer .version { display: none; }
         }
         
         @media print {
@@ -534,7 +548,7 @@
                 visibility: hidden;
             }
             .fixed-header, .fixed-footer, .help-btn, .preview-controls {
-                display: none !important; /* إخفاء الأشرطة الثابتة عند الطباعة */
+                display: none !important;
             }
             .preview-window, .preview-window * {
                 visibility: visible;
@@ -557,7 +571,7 @@
     <div class="fixed-header">
         <div class="logo">
             <i class="fas fa-leaf"></i>
-            <span>تطبيق تقارير الوقاية - By:Ahmad Hussein </span>
+            <span>تطبيق تقارير الوقاية - By: Ahmad Hussein</span>
         </div>
         <div class="date-time" id="currentDateTime"></div>
     </div>
@@ -566,7 +580,7 @@
     <div class="fixed-footer">
         <div class="copyright">
             <i class="far fa-copyright"></i>
-            <span>جميع الحقوق محفوظة - By:Ahmad Hussein</span>
+            <span>جميع الحقوق محفوظة - By: Ahmad Hussein</span>
         </div>
         <div class="version">
             <span>الإصدار 2.0</span>
@@ -576,15 +590,16 @@
     <div class="container">
         <header>
             <h1>تطبيق تقارير الوقاية</h1>
-            <p class="subtitle"> الوقاية</p>
+            <p class="subtitle">الوقاية</p>
         </header>
         
-        <!-- رسالة توضيحية -->
+        <!-- رسالة توضيحية مع إضافة معلومات التثبيت -->
         <div class="info-message">
             <i class="fas fa-info-circle"></i>
-            استخدم زر <strong>"حفظ ومعاينة التقرير"</strong> لعرض التقرير ثم:
-            <br>
-            <strong>"تنزيل PDF"</strong> لتنزيل ملف PDF أو <strong>"طباعة"</strong> للطباعة مباشرة
+            <strong>لتثبيت التطبيق على جهازك:</strong><br>
+            • أيفون: اضغط على زر المشاركة <i class="fas fa-share"></i> ثم "إضافة إلى الشاشة الرئيسية"<br>
+            • أندرويد: اضغط على القائمة <i class="fas fa-ellipsis-vertical"></i> ثم "إضافة إلى الشاشة الرئيسية"<br>
+            <i class="fas fa-download"></i> بعد التثبيت، ستظهر أيقونة التطبيق على شاشتك الرئيسية
         </div>
         
         <div class="main-controls">
@@ -1540,7 +1555,7 @@
             return `
                 <div class="preview-header">
                     <h1>تقرير الوقاية - التقرير النصفي</h1>
-                    <p> الوقاية</p>
+                    <p>الوقاية</p>
                 </div>
                 
                 <div class="preview-section">
@@ -2071,7 +2086,7 @@
                     filesList.appendChild(reportItem);
                 });
                 
-                // إضافة أحداث للأزرار
+                // إضافة أحداث للأزرة
                 document.querySelectorAll('.download-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const reportId = parseInt(this.getAttribute('data-id'));
@@ -2196,9 +2211,5 @@
         });
     </script>
 </body>
-</html>
-    
-  </body>
-  
 </html>
 
